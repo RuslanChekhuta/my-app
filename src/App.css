@@ -1,0 +1,16 @@
+.container {
+  padding: 20px;
+  border: 2px solid #333;
+  margin: 10px;
+  font-family: sans-serif;
+}
+.title {
+  color: darkblue;
+  text-decoration: underline;
+}
+.card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
