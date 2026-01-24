@@ -1,0 +1,4 @@
+.card { border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
+.warning { color: #856404; background-color: #fff3cd; padding: 10px; }
+.strike { text-decoration: line-through; color: #999; }
+.btn { margin-right: 10px; cursor: pointer; }
