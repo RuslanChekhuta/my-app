@@ -1,0 +1,5 @@
+.container { max-width: 800px; margin: 0 auto; padding: 20px; font-family: sans-serif; text-align: center; }
+.header { background: #f4f4f4; padding: 10px; margin-bottom: 20px; border-bottom: 2px solid #ddd; }
+.card { border: 1px solid #ccc; padding: 20px; border-radius: 8px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); display: inline-block; }
+.footer { margin-top: 20px; padding: 10px; font-size: 0.8em; color: #777; }
+.warning-box { background: #ffeeba; padding: 10px; margin-top: 10px; }
