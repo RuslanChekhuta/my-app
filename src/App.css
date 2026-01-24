@@ -1,0 +1,42 @@
+.container {
+  padding: 20px;
+  font-family: sans-serif;
+}
+.section {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+.box {
+  width: 200px;
+  height: 100px;
+  background-color: lightgray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  transition: background 0.3s;
+}
+.box.active {
+  background-color: lightgreen;
+}
+.scroll-box {
+  height: 100px;
+  width: 200px;
+  overflow-y: scroll;
+  border: 2px solid #333;
+  margin-top: 10px;
+}
+.error-img {
+  border: 2px solid red;
+}
+button {
+  margin-right: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+input {
+  padding: 5px;
+  margin-right: 10px;
+}
