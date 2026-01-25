@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
+@theme {
+  --font-display: "Jersey 10", sans-serif;
+}
+
+@custom-variant dark (&:where([data-theme=dark] *));
+
+/* Стили для body, чтобы убрать белые полосы при смене темы */
+body {
+  margin: 0;
+  padding: 0;
+}
