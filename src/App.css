@@ -1,0 +1,33 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: sans-serif;
+}
+.card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+.list-item {
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+}
+.price-tag {
+  font-weight: bold;
+  color: green;
+}
+.old-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-right: 10px;
+}
+.task-done {
+  text-decoration: line-through;
+  color: gray;
+}
+.task-active {
+  color: #333;
+  font-weight: bold;
+}
