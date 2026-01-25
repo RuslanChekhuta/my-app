@@ -1,0 +1,63 @@
+.reg-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 300px;
+}
+.reg-form input,
+.reg-form select {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+.reg-form input.error-border,
+.reg-form select.error-border {
+  border-color: red;
+}
+.error-text {
+  color: red;
+  font-size: 0.8rem;
+  margin-top: -5px;
+  margin-bottom: 10px;
+  display: block;
+}
+.match-success {
+  color: green;
+  font-size: 0.8rem;
+  display: block;
+  margin-bottom: 5px;
+}
+.match-error {
+  color: red;
+  font-size: 0.8rem;
+  display: block;
+  margin-bottom: 5px;
+}
+.success-message {
+  background: #d4edda;
+  color: #155724;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+button[type="submit"] {
+  background: #007bff;
+  color: white;
+  border: none;
+}
+button[type="reset"] {
+  background: transparent;
+  color: #666;
+  border: 1px solid #ccc;
+}
