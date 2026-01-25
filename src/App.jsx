@@ -1,7 +1,7 @@
-import "./App.css";
+import ModalPage from "./components/ModalPage";
 
 function App() {
-  return <></>;
+  return <ModalPage />;
 }
 
 export default App;
