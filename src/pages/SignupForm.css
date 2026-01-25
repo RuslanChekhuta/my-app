@@ -1,0 +1,16 @@
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 300px;
+  padding: 20px;
+  border: 1px solid #ddd;
+}
+.error-msg {
+  color: red;
+  font-size: 12px;
+  margin: 0;
+}
+input {
+  padding: 8px;
+}
