@@ -1,0 +1,36 @@
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.checklist {
+  margin: 12px 0 20px;
+  padding-left: 20px;
+}
+
+.step-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.panel {
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid #d8d8d8;
+  border-radius: 8px;
+}
+
+.hint {
+  margin: 0 0 12px;
+  color: #3a3a3a;
+}
+
+.demo-box {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 6px;
+  background: #f7f8fa;
+}
