@@ -1,7 +1,16 @@
-import "./App.css";
+import { UserProvider } from "./context/UserProvider";
+import { PlayerProvider } from "./context/PlayerProvider";
+
+import Header from "./Header";
 
 function App() {
-  return <></>;
+  return (
+    <UserProvider>
+      <PlayerProvider>
+        <Header />
+      </PlayerProvider>
+    </UserProvider>
+  );
 }
 
 export default App;
