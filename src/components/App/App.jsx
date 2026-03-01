@@ -1,7 +1,12 @@
+import MeasureElement from "../../../MeasureElement";
 import "./App.css";
 
 function App() {
-  return <></>;
+  return (
+    <>
+      <MeasureElement />
+    </>
+  );
 }
 
 export default App;
