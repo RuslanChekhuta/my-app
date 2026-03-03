@@ -1,7 +1,27 @@
-import "./App.css";
+import { useDeferredValue, useEffect, useState } from "react";
+import { SearchList } from "../SearchList";
 
 function App() {
-  return <></>;
+  const [query, setQuery] = useState("");
+  console.log("**************");
+  console.log("Текст в поле input:", query);
+
+  const deferredQuery = useDeferredValue(query);
+
+  useEffect(() => {
+    console.log("App useEffect deferredQuery:", deferredQuery);
+  }, [deferredQuery]);
+
+  useEffect(() => {
+    console.log("App useEffect query:", query);
+  }, [query]);
+
+  return (
+    <>
+      <input type="text" onChange={(e) => setQuery(e.target.value)} />
+      <SearchList query={deferredQuery} />
+    </>
+  );
 }
 
 export default App;
