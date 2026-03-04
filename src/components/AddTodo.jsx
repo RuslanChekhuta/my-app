@@ -46,7 +46,7 @@ export function AddTodo({ onAdd }) {
         </button>
       </div>
       {showDeadlineInput && (
-        <div className="flex items-center gap-2 mt-2 text-gray-500">
+        <div className="flex items-center gap-2 mt-2 border-blue-500 text-gray-500">
           <input
             type="datetime-local"
             value={deadline}
@@ -59,7 +59,7 @@ export function AddTodo({ onAdd }) {
               setDeadline("");
               setShowDeadlineInput(false);
             }}
-            className="p-2 hover:text-gray-700"
+            className="p-2 hover:text-gray-700 cursor-pointer"
           >
             Отмена
           </button>

@@ -1,46 +1,117 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TodoItem } from "./components/TodoItem";
 import { AddTodo } from "./components/AddTodo";
 import ToggleTheme from "./components/ToggleTheme";
 import { getInitialTheme } from "./helpers/getInitialTheme";
 import { toggleTheme } from "./helpers/toggleTheme";
 
+const LOCAL_STORAGE_KEY = "todos";
+const API_URL = "https://69a86e4537caab4b8c61bab8.mockapi.io/api/v1/todos";
+
 function App() {
   const [todos, setTodos] = useState([]);
   const [theme, setTheme] = useState(getInitialTheme());
 
-  const onAdd = (text, deadline) => {
+  useEffect(() => {
+    const loadInitialData = async () => {
+      const savedTodos = JSON.parse(
+        localStorage.getItem(LOCAL_STORAGE_KEY) || "[]",
+      );
+
+      setTodos(savedTodos);
+
+      try {
+        const response = await fetch(API_URL);
+
+        if (response.ok) {
+          const serverTodos = await response.json();
+          setTodos(serverTodos);
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(serverTodos));
+        }
+      } catch (error) {
+        console.error("Ошибка загрузки данных:", error);
+      }
+    };
+    loadInitialData();
+  }, []);
+
+  const onAdd = async (text, deadline) => {
     const newTodo = {
-      id: Date.now(),
+      id: `temp_${Date.now()}`,
       text,
       completed: false,
       createdAt: new Date().toISOString(),
       deadline: deadline || null,
       order: todos.length + 1,
     };
-    setTodos([...todos, newTodo]);
+
+    const updatedTodos = [...todos, newTodo];
+    setTodos(updatedTodos);
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newTodo),
+      });
+
+      const createdTodo = await response.json();
+
+      const syncedTodos = updatedTodos.map((todo) =>
+        todo.id === newTodo.id ? createdTodo : todo,
+      );
+
+      setTodos(syncedTodos);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(syncedTodos));
+    } catch (error) {
+      console.error("Ошибка добавления:", error);
+      setTodos(todos);
+    }
   };
 
-  const onToggleComplete = (id) => {
-    const todoToUpdata = todos.find((todo) => todo.id === id);
-    if (!todoToUpdata) {
-      return;
-    }
+  const toggleComplete = async (id) => {
+    const todoToUpdate = todos.find((todo) => todo.id === id);
+
+    if (!todoToUpdate) return;
 
     const updatedTodo = {
-      ...todoToUpdata,
-      completed: !todoToUpdata.completed,
+      ...todoToUpdate,
+      completed: !todoToUpdate.completed,
     };
 
-    const updataTodos = todos.map((todo) =>
+    const updatedTodos = todos.map((todo) =>
       todo.id === id ? updatedTodo : todo,
     );
 
-    setTodos(updataTodos);
+    setTodos(updatedTodos);
+
+    try {
+      await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedTodo),
+      });
+
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedTodos));
+    } catch (error) {
+      console.error("Ошибка обновления:", error);
+      setTodos(todos);
+    }
   };
 
-  const onDelete = (id) => {
-    setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+  const onDelete = async (id) => {
+    const previousTodos = todos;
+    const updatedTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(updatedTodos);
+
+    try {
+      await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedTodos));
+    } catch (error) {
+      console.error("Ошибка удаления:", error);
+      setTodos(previousTodos);
+    }
   };
 
   return (
@@ -48,7 +119,7 @@ function App() {
       data-theme={theme}
       className="flex flex-col justify-center items-center bg-page-light dark:bg-page-dark p-6 min-h-screen"
     >
-      <ToggleTheme theme={theme} toggleTheme={() => toggleTheme(setTheme)} />
+      <ToggleTheme toggleTheme={() => toggleTheme(setTheme)} theme={theme} />
       <div className="flex flex-col gap-3 mx-auto">
         <h1 className="mb-8 font-bold text-gray-800 dark:text-white text-4xl text-center">
           <span className="bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 text-transparent">
@@ -62,7 +133,7 @@ function App() {
               key={todo.id}
               todo={todo}
               onDelete={onDelete}
-              onToggleComplete={onToggleComplete}
+              onToggleComplete={toggleComplete}
             />
           ))}
         </div>
