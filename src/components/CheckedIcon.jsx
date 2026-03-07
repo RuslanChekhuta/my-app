@@ -1,5 +1,3 @@
-import React from "react";
-
 const CheckedIcon = () => {
   return (
     <svg
@@ -7,7 +5,7 @@ const CheckedIcon = () => {
       viewBox="0 0 20 20"
       fill="none"
       stroke="currentColor"
-      className="w-4 xs:w-5 h-4 xs:h-5"
+      className="w-4 h-4 xs:w-5 xs:h-5"
     >
       <path
         strokeLinecap="round"

@@ -1,33 +1,33 @@
-import React from "react";
 import CheckedIcon from "./CheckedIcon";
 
 const TodoEditForm = ({
   editText,
   setEditText,
-  innerRef,
   editDeadline,
+  innerRef,
   setEditDeadline,
   onSave,
 }) => {
   return (
-    <div className="flex flex-col items-stretch gap-2 w-full" ref={innerRef}>
+    <div className="flex flex-col w-full gap-2 items-stretch" ref={innerRef}>
       <input
         type="text"
         value={editText}
         onChange={(e) => setEditText(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && onSave()}
-        className="px-2 py-1 border-2 border-blue-500 rounded w-full text-gray-700 dark:text-gray-300 text-sm"
+        className="w-full px-2 py-1 border-2 border-blue-500 rounded text-sm text-gray-700 dark:text-gray-300"
       />
-      <div className="flex sm:flex-row flex-col gap-2 w-full">
+
+      <div className="flex flex-col sm:flex-row gap-2 w-full">
         <input
           type="datetime-local"
           value={editDeadline}
           onChange={(e) => setEditDeadline(e.target.value)}
-          className="sm:flex-1 px-2 py-1 border-2 border-blue-500 rounded w-full text-gray-700 dark:text-gray-300 text-sm"
+          className="w-full sm:flex-1 px-2 py-1 border-2 border-blue-500 rounded text-sm text-gray-700 dark:text-gray-300"
         />
         <button
           onClick={onSave}
-          className="flex justify-center items-center gap-1 bg-white px-2 sm:px-3 py-1 sm:py-1 border-2 border-green-500 hover:border-green-50 text-green-600 hover:text-green-800 text-sm sm:text-base transition-colors cursor-pointer"
+          className="flex items-center justify-center gap-1 px-2 py-1 sm:px-3 sm:py-1 text-green-600 hover:text-green-800 cursor-pointer bg-white border-2 border-green-500 rounded hover:bg-green-50 transition-color text-sm sm:text-base"
         >
           <CheckedIcon />
           <span className="sm:hidden">OK</span>

@@ -7,9 +7,9 @@ import {
 
 const TodoList = ({
   todos,
-  setDeletingId,
+  handleUpdate,
   toggleComplete,
-  handleUpdata,
+  setDeletingId,
   onReorder,
 }) => {
   const handleDragEnd = (event) => {
@@ -18,13 +18,11 @@ const TodoList = ({
       onReorder(active.id, over?.id);
     }
   };
+  const todoIds = todos.map((t) => t.id);
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext
-        items={todos.map((t) => t.id)}
-        strategy={verticalListSortingStrategy}
-      >
+      <SortableContext items={todoIds} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-3">
           {todos.map((todo) => (
             <TodoItem
@@ -32,7 +30,7 @@ const TodoList = ({
               todo={todo}
               onDelete={() => setDeletingId(todo.id)}
               onToggleComplete={toggleComplete}
-              onUpdata={handleUpdata}
+              onUpdate={handleUpdate}
             />
           ))}
         </div>

@@ -1,5 +1,3 @@
-import React from "react";
-
 const DeadlineBlock = ({
   showDeadlineInput,
   deadline,
@@ -8,14 +6,13 @@ const DeadlineBlock = ({
 }) => {
   return (
     <>
-      {" "}
       {showDeadlineInput && (
-        <div className="flex items-center gap-2 mt-2 border-blue-500 text-gray-500">
+        <div className="flex items-center gap-2 text-gray-500  mt-2">
           <input
             type="datetime-local"
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
-            className="flex-1 p-2 border rounded"
+            className="p-2 border border-blue-700 rounded flex-1"
           />
           <button
             type="button"
@@ -33,10 +30,9 @@ const DeadlineBlock = ({
         <button
           type="button"
           onClick={() => {
-            setDeadline("");
             setShowDeadlineInput(true);
           }}
-          className="p-2 text-blue-500 hover:text-blue-700"
+          className="self-start text-sm text-blue-500 hover:text-blue-700"
         >
           + Добавить дедлайн
         </button>

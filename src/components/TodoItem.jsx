@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import CheckboxButton from "./CheckboxButton";
 import TodoEditForm from "./TodoEditForm";
 import TodoTextDisplay from "./TodoTextDisplay";
 import DeleteButton from "./DeleteButton";
 import { useSortable } from "@dnd-kit/sortable";
 
-export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdata }) => {
+export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
   const [editDeadline, setEditDeadline] = useState(todo.deadline || "");
-
   const editFormRef = useRef(null);
 
   const {
@@ -19,7 +18,9 @@ export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdata }) => {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: todo.id });
+  } = useSortable({
+    id: todo.id,
+  });
 
   const style = {
     transform: transform
@@ -36,10 +37,10 @@ export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdata }) => {
 
   const handleSave = useCallback(() => {
     if (editText.trim()) {
-      onUpdata(todo.id, editText, editDeadline);
+      onUpdate(todo.id, editText, editDeadline);
     }
     setIsEditing(false);
-  }, [editText, onUpdata, todo.id, editDeadline]);
+  }, [editText, editDeadline, todo.id, onUpdate]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -51,6 +52,7 @@ export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdata }) => {
     if (isEditing) {
       document.addEventListener("click", handleClickOutside);
     }
+
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
@@ -61,11 +63,12 @@ export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdata }) => {
       ref={setNodeRef}
       {...attributes}
       style={style}
-      className="group flex justify-between items-center gap-3 bg-white dark:bg-page-dark shadow-sm hover:shadow-md p-4 border border-gray-100 rounded-lg transition-shadow duration-300"
+      className="group flex items-center 
+    justify-between p-4 gap-3 bg-white dark:bg-page-dark rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100"
     >
       <div
         {...listeners}
-        className="mx-0.5 border-gray-300 border-r-6 border-l-6 border-dotted w-4 h-6 cursor-grab active:cursor-grabbing"
+        className="h-6 w-4 border-l-6 border-r-6 border-gray-300 border-dotted mx-0.5 cursor-grab active:cursor-grabbing"
       ></div>
       <div className="flex items-center gap-3">
         <CheckboxButton completed={todo.completed} onClick={handleToggle} />
@@ -73,9 +76,9 @@ export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdata }) => {
           <TodoEditForm
             editText={editText}
             setEditText={setEditText}
-            innerRef={editFormRef}
             editDeadline={editDeadline}
             setEditDeadline={setEditDeadline}
+            innerRef={editFormRef}
             onSave={handleSave}
           />
         ) : (

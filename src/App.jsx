@@ -12,55 +12,55 @@ function App() {
 
   const {
     todos,
-    onAdd,
-    handleUpdata,
-    toggleComplete,
-    handleDelete,
-    hasCompletedTodos,
-    handleDeletingCompleted,
-    confirmDeletingCompleted,
     deletingId,
     setDeletingId,
     isDeletingCompleted,
     setIsDeletingCompleted,
-    onReorder,
+    onAdd,
+    handleUpdate,
+    toggleComplete,
+    handleDelete,
+    handleDeleteCompleted,
+    confirmDeleteCompleted,
+    hasCompletedTodos,
+    onReorder
   } = useTodoManagement();
 
   return (
     <div
       data-theme={theme}
-      className="flex flex-col justify-center items-center bg-page-light dark:bg-page-dark p-6 min-h-screen"
+      className="flex flex-col min-h-screen justify-center items-center bg-page-light dark:bg-page-dark p-6"
     >
       <ToggleTheme toggleTheme={() => toggleTheme(setTheme)} theme={theme} />
-
       <MainContent
         onAdd={onAdd}
         todos={todos}
-        setDeletingId={setDeletingId}
+        handleUpdate={handleUpdate}
         toggleComplete={toggleComplete}
-        handleUpdata={handleUpdata}
+        setDeletingId={setDeletingId}
         onReorder={onReorder}
       />
-
       <DeleteConfirmModal
+        deletingId={deletingId}
         onCancel={() => setDeletingId(null)}
         onConfirm={() => {
           handleDelete(deletingId);
           setDeletingId(null);
         }}
-        message="Вы уверены что хотите удалить эту задачу?"
-        deletingId={deletingId}
+        message="Вы уверены, что хотите удалить эту задачу?"
       />
 
       <DeleteConfirmModal
-        onCancel={() => setIsDeletingCompleted(false)}
-        onConfirm={confirmDeletingCompleted}
-        message={`Вы уверены что хотите удалить все выполненные задачи ${todos.filter((todo) => todo.completed).length}?`}
         isDeletingCompleted={isDeletingCompleted}
+        onCancel={() => setIsDeletingCompleted(false)}
+        onConfirm={confirmDeleteCompleted}
+        message={`Вы уверены, что хотите удалить все выполненные задачи (${
+          todos.filter((todo) => todo.completed).length
+        })?`}
       />
 
       <DeleteCompletedButton
-        onClick={handleDeletingCompleted}
+        onClick={handleDeleteCompleted}
         hasCompletedTodos={hasCompletedTodos}
       />
     </div>

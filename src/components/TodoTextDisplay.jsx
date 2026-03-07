@@ -1,4 +1,4 @@
-import { formatDateTime } from "../helpers/dateUtils";
+import formatDateTime from "../helpers/dateUtils";
 
 const TodoTextDisplay = ({ todo, setIsEditing }) => {
   return (
@@ -6,7 +6,6 @@ const TodoTextDisplay = ({ todo, setIsEditing }) => {
       className="flex flex-col cursor-pointer"
       onDoubleClick={() => setIsEditing(true)}
     >
-      {" "}
       <span
         className={`text-1 ${
           todo.completed
@@ -16,7 +15,7 @@ const TodoTextDisplay = ({ todo, setIsEditing }) => {
       >
         {todo.text}
       </span>
-      <span className="text-gray-400 text-xs">
+      <span className="text-xs text-gray-400">
         Создано: {formatDateTime(todo.createdAt)}
       </span>
       {todo.deadline && (
@@ -25,8 +24,8 @@ const TodoTextDisplay = ({ todo, setIsEditing }) => {
             todo.completed
               ? "text-gray-400"
               : new Date(todo.deadline) < new Date()
-                ? "text-red-500"
-                : "text-gray-500"
+              ? "text-red-500"
+              : "text-gray-500"
           }`}
         >
           Сделать до: {formatDateTime(todo.deadline)}

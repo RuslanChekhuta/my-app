@@ -5,11 +5,11 @@ import TodoList from "./TodoList";
 import TodoFilter from "./TodoFilter";
 
 const MainContent = ({
-  todos,
   onAdd,
-  setDeletingId,
+  todos,
+  handleUpdate,
   toggleComplete,
-  handleUpdata,
+  setDeletingId,
   onReorder,
 }) => {
   const [filter, setFilter] = useState("all");
@@ -19,17 +19,16 @@ const MainContent = ({
     if (filter === "active") return !todo.completed;
     return true;
   });
-
   return (
-    <div className="flex flex-col gap-3 mx-auto">
+    <div className="mx-auto flex flex-col gap-3">
       <Header />
       <AddTodo onAdd={onAdd} />
       <TodoFilter filter={filter} setFilter={setFilter} />
       <TodoList
         todos={filteredTodos}
-        setDeletingId={setDeletingId}
+        handleUpdate={handleUpdate}
         toggleComplete={toggleComplete}
-        handleUpdata={handleUpdata}
+        setDeletingId={setDeletingId}
         onReorder={onReorder}
       />
     </div>
