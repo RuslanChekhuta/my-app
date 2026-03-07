@@ -72,6 +72,37 @@ function App() {
     }
   };
 
+  const handleUpdata = async (id, newText, newDeadline) => {
+    const todoToUpdata = todos.find((todo) => todo.id === id);
+    if (!todoToUpdata) return;
+
+    const updatedTodo = {
+      ...todoToUpdata,
+      text: newText,
+      deadline: newDeadline,
+    };
+
+    const updatedTodos = todos.map((todo) =>
+      todo.id === id ? updatedTodo : todo,
+    );
+
+    setTodos(updatedTodos);
+
+    try {
+      await fetch(`${API_URL}/${id}`, {
+        method: "PUT",
+
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedTodo),
+      });
+
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedTodos));
+    } catch (error) {
+      console.error("Ошибка обновления:", error);
+      setTodos(todos);
+    }
+  };
+
   const toggleComplete = async (id) => {
     const todoToUpdate = todos.find((todo) => todo.id === id);
 
@@ -174,6 +205,7 @@ function App() {
               todo={todo}
               onDelete={() => setDeletingId(todo.id)}
               onToggleComplete={toggleComplete}
+              onUpdata={handleUpdata}
             />
           ))}
         </div>
