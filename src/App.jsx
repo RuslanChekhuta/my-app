@@ -23,6 +23,7 @@ function App() {
     setDeletingId,
     isDeletingCompleted,
     setIsDeletingCompleted,
+    onReorder,
   } = useTodoManagement();
 
   return (
@@ -38,6 +39,7 @@ function App() {
         setDeletingId={setDeletingId}
         toggleComplete={toggleComplete}
         handleUpdata={handleUpdata}
+        onReorder={onReorder}
       />
 
       <DeleteConfirmModal

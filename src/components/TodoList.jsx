@@ -1,19 +1,43 @@
-import React from "react";
 import { TodoItem } from "./TodoItem";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
-const TodoList = ({ todos, setDeletingId, toggleComplete, handleUpdata }) => {
+const TodoList = ({
+  todos,
+  setDeletingId,
+  toggleComplete,
+  handleUpdata,
+  onReorder,
+}) => {
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (!over || active.id !== over.id) {
+      onReorder(active.id, over?.id);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-3">
-      {todos.map((todo) => (
-        <TodoItem
-          key={todo.id}
-          todo={todo}
-          onDelete={() => setDeletingId(todo.id)}
-          onToggleComplete={toggleComplete}
-          onUpdata={handleUpdata}
-        />
-      ))}
-    </div>
+    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <SortableContext
+        items={todos.map((t) => t.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="flex flex-col gap-3">
+          {todos.map((todo) => (
+            <TodoItem
+              key={todo.id}
+              todo={todo}
+              onDelete={() => setDeletingId(todo.id)}
+              onToggleComplete={toggleComplete}
+              onUpdata={handleUpdata}
+            />
+          ))}
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 };
 
