@@ -7,6 +7,17 @@ export const fetchTodos = async () => {
   return response.json();
 };
 
+export const fetchTodoById = async (id) => {
+  const response = await fetch(`${API_URL}/${id}`);
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) throw new Error("Failed to fetch todo");
+  return response.json();
+};
+
 export const createTodo = async (todo) => {
   const response = await fetch(API_URL, {
     method: "POST",

@@ -27,6 +27,8 @@ function App() {
     confirmDeleteCompleted,
     hasCompletedTodos,
     onReorder,
+    pendingActions,
+    isSyncingPending,
   } = useTodoManagement();
 
   return (
@@ -44,6 +46,8 @@ function App() {
           toggleComplete={toggleComplete}
           setDeletingId={setDeletingId}
           onReorder={onReorder}
+          pendingActionsCount={pendingActions.length}
+          isSyncingPending={isSyncingPending}
         />
       </Suspense>
 

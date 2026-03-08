@@ -38,7 +38,11 @@ export const queueCreateTodoAction = (pendingActions, todo) => {
   ];
 };
 
-export const queueUpdateTodoAction = (pendingActions, todo) => {
+export const queueUpdateTodoAction = (
+  pendingActions,
+  todo,
+  baseTodoSnapshot = null
+) => {
   const createIndex = findLastActionIndex(pendingActions, todo.id, "create");
 
   if (createIndex !== -1) {
@@ -67,14 +71,20 @@ export const queueUpdateTodoAction = (pendingActions, todo) => {
       type: "update",
       todoId: todo.id,
       todo,
+      baseTodoSnapshot,
     },
   ];
 };
 
-export const queueDeleteTodoAction = (pendingActions, todoId) => {
+export const queueDeleteTodoAction = (
+  pendingActions,
+  todoId,
+  baseTodoSnapshot = null
+) => {
   const hasPendingCreate = pendingActions.some(
     (action) => action.todoId === todoId && action.type === "create"
   );
+  const existingAction = pendingActions.find((action) => action.todoId === todoId);
 
   const filteredPendingActions = pendingActions.filter(
     (action) => action.todoId !== todoId
@@ -89,12 +99,37 @@ export const queueDeleteTodoAction = (pendingActions, todoId) => {
     {
       type: "delete",
       todoId,
+      baseTodoSnapshot: existingAction?.baseTodoSnapshot ?? baseTodoSnapshot,
     },
   ];
 };
 
-export const queueMultipleUpdateActions = (pendingActions, todos) => {
+export const queueMultipleUpdateActions = (
+  pendingActions,
+  todos,
+  previousTodos = []
+) => {
   return todos.reduce((nextPendingActions, todo) => {
-    return queueUpdateTodoAction(nextPendingActions, todo);
+    const previousTodo = previousTodos.find((item) => item.id === todo.id);
+
+    return queueUpdateTodoAction(
+      nextPendingActions,
+      todo,
+      previousTodo ?? null
+    );
   }, pendingActions);
+};
+
+export const remapPendingActionTodoId = (pendingActions, previousId, nextTodo) => {
+  return pendingActions.map((action) => {
+    if (action.todoId !== previousId) {
+      return action;
+    }
+
+    return {
+      ...action,
+      todoId: nextTodo.id,
+      todo: action.todo ? { ...action.todo, ...nextTodo, id: nextTodo.id } : action.todo,
+    };
+  });
 };

@@ -1,13 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { createTodo, deleteTodo, fetchTodos, updateTodo } from "../api/todoApi.js";
+import {
+  createTodo,
+  deleteTodo,
+  fetchTodoById,
+  fetchTodos,
+  updateTodo,
+} from "../api/todoApi.js";
 import {
   loadPendingActions,
+  remapPendingActionTodoId,
   savePendingActions,
 } from "../helpers/offlineTodoQueue.js";
 import { loadFromLocalStorage, saveToLocalStorage } from "../helpers/storage.js";
 import {
   createNewTodo,
   getNextTodoOrder,
+  hasTodoConflict,
   sortedSavedTodos,
   toggleTodoCompletion,
   updateTodoData,
@@ -20,6 +28,7 @@ export const useTodoManagement = () => {
   const [deletingId, setDeletingId] = useState(null);
   const [isDeletingCompleted, setIsDeletingCompleted] = useState(false);
   const [pendingActions, setPendingActions] = useState(loadPendingActions);
+  const [isSyncingPending, setIsSyncingPending] = useState(false);
   const todosRef = useRef([]);
   const isSyncingPendingRef = useRef(false);
   const { isOnline, showInfoMessage, showRequestError, showSuccessMessage } =
@@ -80,9 +89,11 @@ export const useTodoManagement = () => {
       }
 
       isSyncingPendingRef.current = true;
+      setIsSyncingPending(true);
 
       try {
         let syncedTodos = [...todosRef.current];
+        let nextPendingActions = remainingActions;
 
         if (currentAction.type === "create") {
           const { id: temporaryId, ...todoPayload } = currentAction.todo;
@@ -94,14 +105,54 @@ export const useTodoManagement = () => {
         }
 
         if (currentAction.type === "update") {
-          await updateTodo(currentAction.todoId, currentAction.todo);
-          syncedTodos = syncedTodos.map((todo) =>
-            todo.id === currentAction.todoId ? currentAction.todo : todo
-          );
+          const serverTodo = await fetchTodoById(currentAction.todoId);
+
+          if (!serverTodo) {
+            const { id: previousId, ...todoPayload } = currentAction.todo;
+            const recreatedTodo = await createTodo(todoPayload);
+            const resolvedTodo = {
+              ...currentAction.todo,
+              ...recreatedTodo,
+            };
+
+            syncedTodos = syncedTodos.map((todo) =>
+              todo.id === previousId ? resolvedTodo : todo
+            );
+            nextPendingActions = remapPendingActionTodoId(
+              remainingActions,
+              previousId,
+              resolvedTodo
+            );
+            showInfoMessage(
+              "Задача была удалена на сервере. Локальная версия создана заново."
+            );
+          } else {
+            if (hasTodoConflict(serverTodo, currentAction.baseTodoSnapshot)) {
+              showInfoMessage(
+                "Обнаружен конфликт версии задачи. Применена локальная версия."
+              );
+            }
+
+            await updateTodo(currentAction.todoId, currentAction.todo);
+            syncedTodos = syncedTodos.map((todo) =>
+              todo.id === currentAction.todoId ? currentAction.todo : todo
+            );
+          }
         }
 
         if (currentAction.type === "delete") {
-          await deleteTodo(currentAction.todoId);
+          const serverTodo = await fetchTodoById(currentAction.todoId);
+
+          if (serverTodo) {
+            if (hasTodoConflict(serverTodo, currentAction.baseTodoSnapshot)) {
+              showInfoMessage(
+                "Обнаружен конфликт перед удалением. Выбрано локальное удаление."
+              );
+            }
+
+            await deleteTodo(currentAction.todoId);
+          }
+
           syncedTodos = syncedTodos.filter(
             (todo) => todo.id !== currentAction.todoId
           );
@@ -110,9 +161,9 @@ export const useTodoManagement = () => {
         if (!isCancelled) {
           setTodos(syncedTodos);
           saveToLocalStorage(syncedTodos);
-          setPendingActions(remainingActions);
+          setPendingActions(nextPendingActions);
 
-          if (remainingActions.length === 0) {
+          if (nextPendingActions.length === 0) {
             showSuccessMessage("Локальные изменения синхронизированы.");
           }
         }
@@ -126,6 +177,7 @@ export const useTodoManagement = () => {
         }
       } finally {
         isSyncingPendingRef.current = false;
+        setIsSyncingPending(false);
       }
     };
 
@@ -137,6 +189,7 @@ export const useTodoManagement = () => {
   }, [
     isOnline,
     pendingActions,
+    showInfoMessage,
     showRequestError,
     showSuccessMessage,
   ]);
@@ -168,6 +221,7 @@ export const useTodoManagement = () => {
     isDeletingCompleted,
     setIsDeletingCompleted,
     pendingActions,
+    isSyncingPending,
     ...actions,
   };
 };

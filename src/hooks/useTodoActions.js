@@ -4,6 +4,7 @@ import {
   queueMultipleUpdateActions,
   queueUpdateTodoAction,
 } from "../helpers/offlineTodoQueue.js";
+import { createTodoSyncSnapshot } from "../helpers/todoHelpers.js";
 
 export const useTodoActions = ({
   todos,
@@ -90,7 +91,11 @@ export const useTodoActions = ({
     if (shouldQueueLocally) {
       persistQueuedChange({
         updatedTodos,
-        nextPendingActions: queueUpdateTodoAction(pendingActions, updatedTodo),
+        nextPendingActions: queueUpdateTodoAction(
+          pendingActions,
+          updatedTodo,
+          createTodoSyncSnapshot(todoToUpdate)
+        ),
         message: getQueuedMessage("Изменение задачи"),
       });
       return;
@@ -122,7 +127,11 @@ export const useTodoActions = ({
     if (shouldQueueLocally) {
       persistQueuedChange({
         updatedTodos,
-        nextPendingActions: queueUpdateTodoAction(pendingActions, updatedTodo),
+        nextPendingActions: queueUpdateTodoAction(
+          pendingActions,
+          updatedTodo,
+          createTodoSyncSnapshot(todoToUpdate)
+        ),
         message: getQueuedMessage("Статус задачи"),
       });
       return;
@@ -147,7 +156,11 @@ export const useTodoActions = ({
     if (shouldQueueLocally) {
       persistQueuedChange({
         updatedTodos,
-        nextPendingActions: queueDeleteTodoAction(pendingActions, id),
+        nextPendingActions: queueDeleteTodoAction(
+          pendingActions,
+          id,
+          createTodoSyncSnapshot(previousTodos.find((todo) => todo.id === id))
+        ),
         message: getQueuedMessage("Удаление задачи"),
       });
       return;
@@ -183,7 +196,13 @@ export const useTodoActions = ({
 
     if (shouldQueueLocally) {
       const nextPendingActions = completedIds.reduce((queue, id) => {
-        return queueDeleteTodoAction(queue, id);
+        return queueDeleteTodoAction(
+          queue,
+          id,
+          createTodoSyncSnapshot(
+            originalTodos.find((todo) => todo.id === id)
+          )
+        );
       }, pendingActions);
 
       persistQueuedChange({
@@ -251,7 +270,8 @@ export const useTodoActions = ({
           updatedTodos,
           nextPendingActions: queueMultipleUpdateActions(
             pendingActions,
-            updatedTodos
+            updatedTodos,
+            previousTodos
           ),
           message: getQueuedMessage("Новый порядок задач"),
         });

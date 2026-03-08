@@ -3,6 +3,7 @@ import Header from "./Header";
 import { AddTodo } from "./AddTodo";
 import TodoList from "./TodoList";
 import TodoFilter from "./TodoFilter";
+import PendingActionsBadge from "./PendingActionsBadge";
 
 const MainContent = ({
   onAdd,
@@ -11,6 +12,8 @@ const MainContent = ({
   toggleComplete,
   setDeletingId,
   onReorder,
+  pendingActionsCount,
+  isSyncingPending,
 }) => {
   const [filter, setFilter] = useState("all");
 
@@ -22,6 +25,10 @@ const MainContent = ({
   return (
     <div className="flex flex-col gap-3 mx-auto">
       <Header />
+      <PendingActionsBadge
+        pendingActionsCount={pendingActionsCount}
+        isSyncingPending={isSyncingPending}
+      />
       <AddTodo onAdd={onAdd} />
       <TodoFilter filter={filter} setFilter={setFilter} />
       <TodoList
