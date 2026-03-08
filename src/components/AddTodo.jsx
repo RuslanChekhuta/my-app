@@ -7,8 +7,12 @@ import {
   RiSparklingLine,
 } from "react-icons/ri";
 import DeadlineBlock from "./DeadlineBlock";
+import Button from "./ui/Button";
 import EyebrowChip from "./ui/EyebrowChip";
+import FieldControl from "./ui/FieldControl";
 import GlassPanel from "./ui/GlassPanel";
+import StatusMessage from "./ui/StatusMessage";
+import StatusPill from "./ui/StatusPill";
 import { useSpeechRecognition } from "../hooks/useSpeechRecognition";
 
 export function AddTodo({ onAdd }) {
@@ -57,7 +61,7 @@ export function AddTodo({ onAdd }) {
     <GlassPanel
       as="form"
       onSubmit={handleSubmit}
-      className="p-4 shadow-[0_30px_100px_rgba(17,35,46,0.12)] sm:p-5"
+      className="motion-fade-up p-4 shadow-[0_30px_100px_rgba(17,35,46,0.12)] sm:p-5 motion-delay-1"
     >
       <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-2xl">
@@ -74,22 +78,17 @@ export function AddTodo({ onAdd }) {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300">
-          <span className="rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 dark:border-slate-700 dark:bg-slate-900/70">
-            Голосовой ввод
-          </span>
-          <span className="rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 dark:border-slate-700 dark:bg-slate-900/70">
-            Локальная очередь
-          </span>
+          <StatusPill tone="neutral">Голосовой ввод</StatusPill>
+          <StatusPill tone="neutral">Локальная очередь</StatusPill>
           {deadline && (
-            <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(229,122,74,0.18)] bg-[rgba(229,122,74,0.12)] px-3 py-1.5 text-[#a74f28] dark:border-[rgba(255,173,139,0.24)] dark:bg-[rgba(229,122,74,0.14)] dark:text-[#ffc7af]">
-              <RiCalendarScheduleLine className="text-sm" />
+            <StatusPill icon={RiCalendarScheduleLine} tone="warm">
               {new Date(deadline).toLocaleString("ru-RU", {
                 day: "numeric",
                 month: "short",
                 hour: "2-digit",
                 minute: "2-digit",
               })}
-            </span>
+            </StatusPill>
           )}
         </div>
       </div>
@@ -97,7 +96,7 @@ export function AddTodo({ onAdd }) {
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto_auto]">
         <label className="group relative block">
           <span className="sr-only">Текст новой задачи</span>
-          <input
+          <FieldControl
             type="text"
             value={text}
             onChange={(e) => {
@@ -107,22 +106,23 @@ export function AddTodo({ onAdd }) {
               }
             }}
             placeholder="Например: подготовить обзор недели и созвон с командой"
-            className="min-h-14 w-full rounded-[1.35rem] border border-slate-200 bg-[rgba(255,255,255,0.85)] px-4 pr-12 text-[15px] text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[rgba(21,119,128,0.5)] focus:ring-4 focus:ring-[rgba(21,119,128,0.12)] dark:border-slate-800 dark:bg-slate-900/75 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-[rgba(84,205,208,0.45)] dark:focus:ring-[rgba(84,205,208,0.12)]"
+            className="min-h-14 rounded-[1.35rem] bg-[rgba(255,255,255,0.85)] pr-12 text-[15px] dark:border-slate-800 dark:bg-slate-900/75"
           />
           <RiArrowRightUpLine className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-lg text-slate-300 transition group-focus-within:text-[#0e6971] dark:text-slate-600 dark:group-focus-within:text-[#8be4e6]" />
         </label>
 
-        <button
-          type="button"
+        <Button
           onClick={() => toggleListening(text)}
           disabled={!isSupported}
-          className={`inline-flex min-h-14 items-center justify-center gap-2 rounded-[1.35rem] border px-4 text-sm font-semibold transition ${
+          variant={
             !isSupported
-              ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-600"
+              ? "secondary"
               : isListening
-                ? "border-[rgba(181,38,54,0.24)] bg-[rgba(181,38,54,0.12)] text-[#8f1f2d] shadow-[0_20px_45px_rgba(181,38,54,0.12)] dark:border-[rgba(255,115,141,0.24)] dark:bg-[rgba(181,38,54,0.18)] dark:text-[#ffb1be]"
-                : "cursor-pointer border-slate-200 bg-white/85 text-slate-700 hover:border-[rgba(21,119,128,0.28)] hover:text-[#0e6971] dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-[rgba(84,205,208,0.28)] dark:hover:text-[#8be4e6]"
-          }`}
+                ? "dangerSoft"
+                : "secondary"
+          }
+          size="lg"
+          className={!isSupported ? "bg-slate-100 text-slate-400 dark:bg-slate-900/60 dark:text-slate-600" : ""}
           title={
             !isSupported
               ? "Голосовой ввод недоступен"
@@ -146,20 +146,18 @@ export function AddTodo({ onAdd }) {
           <span className="hidden sm:inline">
             {isListening ? "Запись" : "Голос"}
           </span>
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="submit"
-          className={`inline-flex min-h-14 items-center justify-center gap-2 rounded-[1.35rem] px-5 text-sm font-semibold text-white transition ${
-            isListening
-              ? "cursor-not-allowed bg-slate-400 dark:bg-slate-700"
-              : "cursor-pointer bg-[linear-gradient(135deg,#157780_0%,#1f8d8d_100%)] shadow-[0_18px_40px_rgba(21,119,128,0.28)] hover:-translate-y-0.5 hover:shadow-[0_24px_52px_rgba(21,119,128,0.34)] dark:bg-[linear-gradient(135deg,#1f8d8d_0%,#40a9aa_100%)]"
-          }`}
+          variant="primary"
+          size="lg"
+          className={isListening ? "bg-slate-400 dark:bg-slate-700" : ""}
           disabled={isListening}
         >
           Создать
           <RiArrowRightUpLine className="text-lg" />
-        </button>
+        </Button>
       </div>
 
       <DeadlineBlock
@@ -169,25 +167,29 @@ export function AddTodo({ onAdd }) {
         setShowDeadlineInput={setShowDeadlineInput}
       />
       {inputError && (
-        <div className="mt-3 rounded-2xl border border-[rgba(181,38,54,0.18)] bg-[rgba(181,38,54,0.08)] px-4 py-3 text-sm text-[#8f1f2d] dark:border-[rgba(255,115,141,0.2)] dark:bg-[rgba(181,38,54,0.14)] dark:text-[#ffb1be]">
+        <StatusMessage tone="error" className="motion-fade-up mt-3">
           {inputError}
-        </div>
+        </StatusMessage>
       )}
       {!isSupported && (
-        <div className="mt-3 rounded-2xl border border-[rgba(229,122,74,0.18)] bg-[rgba(229,122,74,0.08)] px-4 py-3 text-sm text-[#9a4a25] dark:border-[rgba(255,173,139,0.2)] dark:bg-[rgba(229,122,74,0.14)] dark:text-[#ffc7af]">
+        <StatusMessage tone="warning" className="motion-fade-up mt-3">
           Голосовой ввод не поддерживается в этом браузере.
-        </div>
+        </StatusMessage>
       )}
       {speechError && isSupported && (
-        <div className="mt-3 rounded-2xl border border-[rgba(181,38,54,0.18)] bg-[rgba(181,38,54,0.08)] px-4 py-3 text-sm text-[#8f1f2d] dark:border-[rgba(255,115,141,0.2)] dark:bg-[rgba(181,38,54,0.14)] dark:text-[#ffb1be]">
+        <StatusMessage tone="error" className="motion-fade-up mt-3">
           {speechError}
-        </div>
+        </StatusMessage>
       )}
       {isListening && (
-        <div className="mt-3 inline-flex items-center gap-3 rounded-full border border-[rgba(181,38,54,0.14)] bg-[rgba(181,38,54,0.08)] px-4 py-2 text-sm text-[#8f1f2d] dark:border-[rgba(255,115,141,0.2)] dark:bg-[rgba(181,38,54,0.14)] dark:text-[#ffb1be]">
-          <div className="h-2.5 w-2.5 rounded-full bg-[#c23647] animate-pulse"></div>
-          <span>Идет запись. Нажмите на кнопку микрофона для остановки.</span>
-        </div>
+        <StatusPill
+          tone="danger"
+          dot
+          animatedDot
+          className="motion-fade-up mt-3"
+        >
+          Идет запись. Нажмите на кнопку микрофона для остановки.
+        </StatusPill>
       )}
     </GlassPanel>
   );

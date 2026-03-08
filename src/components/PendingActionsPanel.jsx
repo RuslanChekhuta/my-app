@@ -4,9 +4,11 @@ import {
   RiShieldCheckLine,
 } from "react-icons/ri";
 import { CONFLICT_STRATEGIES } from "../constants/todos";
+import FieldControl from "./ui/FieldControl";
 import EyebrowChip from "./ui/EyebrowChip";
 import GlassPanel from "./ui/GlassPanel";
 import MetricCard from "./ui/MetricCard";
+import StatusPill from "./ui/StatusPill";
 
 const ACTION_LABELS = {
   create: "Создание",
@@ -33,7 +35,7 @@ const PendingActionsPanel = ({
   setConflictStrategy,
 }) => {
   return (
-    <GlassPanel className="p-4 shadow-[0_30px_100px_rgba(17,35,46,0.09)] sm:p-5">
+    <GlassPanel className="motion-fade-up motion-delay-4 p-4 shadow-[0_30px_100px_rgba(17,35,46,0.09)] sm:p-5">
       <div className="flex flex-col gap-4">
         <div>
           <EyebrowChip icon={RiCloudLine}>Центр синхронизации</EyebrowChip>
@@ -77,10 +79,11 @@ const PendingActionsPanel = ({
 
         <label className="flex flex-col gap-1 text-sm text-slate-700 dark:text-slate-200">
           <span>Стратегия конфликтов</span>
-          <select
+          <FieldControl
+            as="select"
             value={conflictStrategy}
             onChange={(event) => setConflictStrategy(event.target.value)}
-            className="min-h-12 rounded-2xl border border-slate-200 bg-white/85 px-4 text-sm outline-none transition focus:border-[rgba(21,119,128,0.4)] focus:ring-4 focus:ring-[rgba(21,119,128,0.12)] dark:border-slate-700 dark:bg-slate-900/75 dark:focus:border-[rgba(84,205,208,0.35)] dark:focus:ring-[rgba(84,205,208,0.12)]"
+            className="bg-white/85 dark:bg-slate-900/75"
           >
             <option value={CONFLICT_STRATEGIES.LOCAL_WINS}>
               Локальная версия
@@ -88,7 +91,7 @@ const PendingActionsPanel = ({
             <option value={CONFLICT_STRATEGIES.SERVER_WINS}>
               Серверная версия
             </option>
-          </select>
+          </FieldControl>
         </label>
       </div>
 
@@ -126,17 +129,14 @@ const PendingActionsPanel = ({
                     </p>
                   </div>
 
-                  <span
-                    className={`w-fit rounded-full px-3 py-1 text-xs font-medium ${
-                      isSyncingPending && index === 0
-                        ? "bg-[rgba(21,119,128,0.1)] text-[#0e6971] dark:bg-[rgba(84,205,208,0.12)] dark:text-[#8be4e6]"
-                        : "bg-[rgba(229,122,74,0.12)] text-[#9a4a25] dark:bg-[rgba(229,122,74,0.14)] dark:text-[#ffc7af]"
-                    }`}
+                  <StatusPill
+                    tone={isSyncingPending && index === 0 ? "accent" : "warm"}
+                    className="w-fit px-3 py-1"
                   >
                     {isSyncingPending && index === 0
                       ? "Синхронизируется"
                       : "Ждёт отправки"}
-                  </span>
+                  </StatusPill>
                 </div>
               </div>
             </div>

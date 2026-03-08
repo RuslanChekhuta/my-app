@@ -6,7 +6,7 @@ import TodoTextDisplay from "./TodoTextDisplay";
 import DeleteButton from "./DeleteButton";
 import { useSortable } from "@dnd-kit/sortable";
 
-export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdate }) => {
+export const TodoItem = ({ todo, index = 0, onDelete, onToggleComplete, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
   const [editDeadline, setEditDeadline] = useState(todo.deadline || "");
@@ -30,6 +30,7 @@ export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdate }) => {
     transition,
     zIndex: isDragging ? 20 : "auto",
     opacity: isDragging ? 0.92 : 1,
+    animationDelay: `${Math.min(index, 10) * 45}ms`,
   };
 
   const handleToggle = () => {
@@ -64,7 +65,7 @@ export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdate }) => {
       ref={setNodeRef}
       {...attributes}
       style={style}
-      className={`group flex items-start justify-between gap-3 rounded-[1.5rem] border p-4 transition duration-300 sm:p-5 ${
+      className={`motion-fade-up group flex items-start justify-between gap-3 rounded-[1.5rem] border p-4 transition duration-300 sm:p-5 ${
         todo.completed
           ? "border-[rgba(21,119,128,0.14)] bg-[rgba(231,245,244,0.85)] shadow-[0_18px_50px_rgba(17,35,46,0.06)] dark:border-[rgba(84,205,208,0.14)] dark:bg-[rgba(13,36,42,0.72)]"
           : "border-white/70 bg-white/90 shadow-[0_22px_55px_rgba(17,35,46,0.07)] hover:-translate-y-0.5 hover:shadow-[0_30px_70px_rgba(17,35,46,0.12)] dark:border-white/10 dark:bg-slate-950/72"

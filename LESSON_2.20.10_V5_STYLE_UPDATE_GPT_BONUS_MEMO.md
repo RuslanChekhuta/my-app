@@ -22,11 +22,15 @@
 - [GlassPanel.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/GlassPanel.jsx)
 - [MetricCard.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/MetricCard.jsx)
 - [EyebrowChip.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/EyebrowChip.jsx)
+- [Button.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/Button.jsx)
+- [FieldControl.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/FieldControl.jsx)
+- [StatusPill.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/StatusPill.jsx)
+- [StatusMessage.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/StatusMessage.jsx)
 - [cn.js](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/helpers/cn.js)
 
 Это важный шаг, потому что:
 - визуальный стиль больше не размазан вручную по каждому компоненту;
-- стеклянные панели, метрики и фирменные чипы собираются единообразно;
+- панели, метрики, действия, поля и статусы собираются единообразно;
 - дальнейшее развитие UI становится дешевле по коду и чище по структуре.
 
 Раньше стиль был сильным, но всё ещё частично “ручным”.
@@ -37,7 +41,7 @@
 ### Header теперь собран из дизайн-примитивов
 
 В [Header.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/Header.jsx):
-- корневой hero блок построен через `GlassPanel`;
+- корневой hero-блок построен через `GlassPanel`;
 - фирменная подпись строится через `EyebrowChip`;
 - статистика рендерится через `MetricCard`.
 
@@ -61,7 +65,7 @@
 
 В [PendingActionsPanel.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/PendingActionsPanel.jsx):
 - sync-панель оформлена как полноценный системный блок;
-- есть отдельные метрики `Queue / Status / Strategy`;
+- есть отдельные метрики `Очередь / Статус / Стратегия`;
 - можно выбирать `conflictStrategy`;
 - каждая pending-операция визуально представлена карточкой;
 - видно, есть ли `baseTodoSnapshot`;
@@ -77,9 +81,23 @@
 - есть idle-state;
 - есть sync-state;
 - есть waiting-state;
-- цвет и текст согласованы с общей визуальной системой.
+- цвет и текст согласованы с общей визуальной системой;
+- компактный статус теперь собирается через `StatusPill`.
 
 То есть status-chip теперь не просто предупреждает, а выполняет роль компактного индикатора состояния системы.
+
+### Статусы стали системными, а не локальными
+
+В [StatusPill.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/StatusPill.jsx) и [StatusMessage.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/StatusMessage.jsx):
+- вынесены компактные статусные чипы;
+- вынесены системные сообщения с едиными tone-вариантами;
+- один и тот же язык состояний теперь переиспользуется в разных местах.
+
+Это видно в:
+- [AddTodo.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/AddTodo.jsx);
+- [PendingActionsBadge.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/PendingActionsBadge.jsx);
+- [PendingActionsPanel.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/PendingActionsPanel.jsx);
+- [Notification.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/Notification.jsx).
 
 ## 5) Что стало лучше в брендировании интерфейса
 
@@ -100,22 +118,46 @@
 
 Для учебного проекта это очень сильный уровень.
 
-## 6) Что изменилось в форме AddTodo
+## 6) Что добавилось в action/input-слое
+
+### Появились общие кнопки и поля
+
+В [Button.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/Button.jsx) и [FieldControl.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/FieldControl.jsx):
+- появились общие варианты `primary`, `secondary`, `danger`, `dangerSoft`, `successSoft`, `warmSoft`, `ghost`;
+- зафиксированы повторяющиеся размеры кнопок;
+- поля ввода и `select` получили единый base-style.
+
+Это уже используется в:
+- [AddTodo.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/AddTodo.jsx);
+- [TodoEditForm.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/TodoEditForm.jsx);
+- [DeadlineBlock.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/DeadlineBlock.jsx);
+- [DeleteConfirmModal.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/DeleteConfirmModal.jsx);
+- [DeleteCompletedButton.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/DeleteCompletedButton.jsx);
+- [DeleteButton.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/DeleteButton.jsx);
+- [PendingActionsPanel.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/PendingActionsPanel.jsx).
+
+Почему это важно:
+- новая секция UI уже не собирается каждый раз с нуля;
+- action-поведение стало визуально предсказуемым;
+- опасные и основные действия читаются быстрее и стабильнее.
+
+## 7) Что изменилось в форме AddTodo
 
 В [AddTodo.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/AddTodo.jsx):
 - форма теперь тоже построена через `GlassPanel`;
 - верхняя часть оформлена как mini-intro для capture-сценария;
 - `EyebrowChip` используется как продуктовый маркер секции;
 - статус дедлайна встроен в систему badges;
-- кнопки голоса и создания согласованы с новым визуальным ритмом;
-- ошибки и speech-состояния оформлены как системные уведомления внутри формы.
+- кнопки голоса и создания переведены на `Button`;
+- поле ввода переведено на `FieldControl`;
+- ошибки и speech-состояния оформлены через `StatusMessage` и `StatusPill`.
 
 Почему это важно:
 - пользователь лучше понимает, где главный action;
 - голосовой ввод ощущается органичной частью формы;
 - сценарий добавления выглядит как “capture workflow”, а не как обычный input с кнопкой.
 
-## 7) Что стало лучше в поддерживаемости стилей
+## 8) Что стало лучше в поддерживаемости стилей
 
 До этой версии проблема выразительного UI обычно одна:
 он выглядит лучше, но начинает стоить слишком дорого в поддержке.
@@ -124,39 +166,66 @@
 - `cn.js` помогает собирать классы без ручного склеивания строк;
 - `GlassPanel` убирает копипасту стеклянных контейнеров;
 - `MetricCard` стандартизирует карточки статистики;
-- `EyebrowChip` стандартизирует маленькие сигнальные элементы.
+- `EyebrowChip` стандартизирует маленькие сигнальные элементы;
+- `Button` стандартизирует действия;
+- `FieldControl` стандартизирует поля;
+- `StatusPill` и `StatusMessage` стандартизируют состояния.
 
 Это уже правильный компромисс между:
 - свободой Tailwind;
 - и нуждой в повторяемом UI.
 
-## 8) Что важно понять из этой версии
+## 9) Как появились единые motion-patterns
+
+В [index.css](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/index.css):
+- добавлены ключевые анимации `fadeUp`, `fadeIn`, `scaleIn`, `slideDown`;
+- введены общие motion-классы `motion-fade-up`, `motion-fade-in`, `motion-scale-in`, `motion-slide-down`, `motion-press`;
+- есть `motion-delay-*` для мягкого появления блоков;
+- учтён `prefers-reduced-motion`.
+
+Эти паттерны уже применяются в:
+- [Header.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/Header.jsx);
+- [AddTodo.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/AddTodo.jsx);
+- [MainContent.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/MainContent.jsx);
+- [PendingActionsBadge.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/PendingActionsBadge.jsx);
+- [PendingActionsPanel.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/PendingActionsPanel.jsx);
+- [Notification.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/Notification.jsx);
+- [DeleteConfirmModal.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/DeleteConfirmModal.jsx);
+- [TodoItem.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/TodoItem.jsx);
+- [Loader.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/Loader.jsx).
+
+Это важно, потому что:
+- движение стало частью системы, а не случайным набором hover-эффектов;
+- панели, уведомления и карточки ведут себя согласованно;
+- интерфейс ощущается более продуктовым, но без перегруза.
+
+## 10) Что важно понять из этой версии
 
 - Сильный стиль сам по себе недостаточен, если его нельзя масштабировать.
 - UI-примитивы — это не “переусложнение”, а способ защитить проект от хаоса при росте.
 - В продукте с offline/sync/conflict-поведением визуальная система особенно важна, потому что она объясняет сложное состояние без технических терминов.
-- Хороший интерфейс не скрывает сложность системы, а упаковывает её в понятные панели, бейджи и метрики.
+- Хороший интерфейс не скрывает сложность системы, а упаковывает её в понятные панели, бейджи, действия и метрики.
 
-## 9) Почему это уже не просто style update, а design-system step
+## 11) Почему это уже не просто style update, а design-system step
 
 Признаки дизайн-системного шага здесь очевидны:
 - повторяющиеся паттерны вынесены в базовые компоненты;
 - стиль не зависит от конкретного экрана;
 - одни и те же сущности выглядят одинаково в разных местах;
-- система цветов и карточек ведёт себя предсказуемо;
-- layout, метрики и статусы теперь собираются как конструктор.
+- система цветов, действий и статусов ведёт себя предсказуемо;
+- layout, метрики, поля и панели теперь собираются как конструктор.
 
 Это и отличает “красивую версию” от “поддерживаемой дизайн-системы”.
 
-## 10) Что ещё стоит улучшить дальше
+## 12) Что ещё стоит улучшить дальше
 
-- Сейчас `TodoItem`, `Notification` и `DeleteConfirmModal` всё ещё держат длинные Tailwind-цепочки; их тоже можно постепенно подтягивать к общим UI-primitives.
-- Можно ввести ещё один слой для action-кнопок: primary, secondary, danger.
+- Сейчас `TodoItem` и часть element-level контролов вроде `CheckboxButton` всё ещё держат локальные Tailwind-цепочки; их тоже можно постепенно подтягивать к общим UI-primitives.
+- Можно ввести ещё один слой для action-кнопок, если появятся отдельные сценарии toolbar/navigation.
 - Можно развить систему spacing/section-shell, если экранов станет больше.
 - Можно выделить общие токены для warning/success/info-состояний, а не держать их локально в нескольких компонентах.
-- Можно добавить motion-patterns, чтобы визуальная система включала не только статику, но и анимационное поведение.
+- Можно развить motion-system дальше: stagger для списков, мягкие state transitions и skeleton-режимы.
 
-## 11) Что запомнить как итог
+## 13) Что запомнить как итог
 
 `v5-style-update-gpt` — это момент, когда проект начинает выглядеть как продукт не только визуально, но и структурно.
 
@@ -164,11 +233,12 @@
 - UI стал выразительным;
 - сложная sync-логика стала понятной;
 - повторяемые стилистические решения перестали дублироваться вручную;
+- действия, поля и статусы стали системными;
 - приложение получило зачатки собственной дизайн-системы.
 
 Именно это превращает сильный учебный интерфейс в систему, которую уже можно уверенно развивать дальше.
 
-## 12) Чеклист версии v5
+## 14) Чеклист версии v5
 
 - [x] Появились базовые UI-примитивы (`GlassPanel`, `MetricCard`, `EyebrowChip`).
 - [x] Добавлен helper `cn` для сборки классов.
@@ -178,8 +248,8 @@
 - [x] AddTodo встроен в общую дизайн-систему.
 - [x] Повторяющиеся visual patterns частично стандартизированы.
 - [x] Бренд `Signal Tasks` стал цельнее.
-- [ ] Можно расширить систему до общих button/input/status primitives.
-- [ ] Можно добавить единые motion-patterns.
+- [x] Система расширена до общих button/input/status primitives.
+- [x] Добавлены единые motion-patterns.
 
 ---
 

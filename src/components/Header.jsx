@@ -7,7 +7,7 @@ const Header = ({ todos, pendingActionsCount, isSyncingPending }) => {
   const activeCount = todos.length - completedCount;
 
   return (
-    <GlassPanel className="relative rounded-[2rem] p-6 shadow-[0_30px_100px_rgba(17,35,46,0.12)] sm:p-8">
+    <GlassPanel className="motion-fade-up relative rounded-[2rem] p-6 shadow-[0_30px_100px_rgba(17,35,46,0.12)] sm:p-8">
       <div className="absolute top-0 right-0 h-40 w-40 rounded-full bg-[rgba(229,122,74,0.18)] blur-3xl"></div>
       <div className="absolute bottom-[-3rem] left-[-1rem] h-48 w-48 rounded-full bg-[rgba(21,119,128,0.18)] blur-3xl"></div>
 

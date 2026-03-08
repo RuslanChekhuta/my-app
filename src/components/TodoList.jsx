@@ -52,6 +52,7 @@ const TodoList = ({
           {todos.map((todo) => (
             <TodoItem
               key={todo.id}
+              index={todo.order}
               todo={todo}
               onDelete={() => setDeletingId(todo.id)}
               onToggleComplete={toggleComplete}

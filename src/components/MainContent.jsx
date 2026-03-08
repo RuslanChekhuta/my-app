@@ -41,7 +41,7 @@ const MainContent = ({
         <section className="space-y-5">
           <AddTodo onAdd={onAdd} />
 
-          <GlassPanel className="p-4 shadow-[0_30px_100px_rgba(17,35,46,0.09)] sm:p-5">
+          <GlassPanel className="motion-fade-up motion-delay-2 p-4 shadow-[0_30px_100px_rgba(17,35,46,0.09)] sm:p-5">
             <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <EyebrowChip tone="neutral">Рабочий поток</EyebrowChip>
