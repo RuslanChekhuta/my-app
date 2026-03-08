@@ -1,36 +1,62 @@
 import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
 import { MdOutlineFilterList } from "react-icons/md";
 
-const TodoFilter = ({ filter, setFilter }) => {
+const FILTERS = [
+  {
+    id: "all",
+    label: "Все",
+    icon: MdOutlineFilterList,
+    getCount: (todos) => todos.length,
+  },
+  {
+    id: "active",
+    label: "В работе",
+    icon: FaRegCircle,
+    getCount: (todos) => todos.filter((todo) => !todo.completed).length,
+  },
+  {
+    id: "completed",
+    label: "Готово",
+    icon: FaCheckCircle,
+    getCount: (todos) => todos.filter((todo) => todo.completed).length,
+  },
+];
+
+const TodoFilter = ({ filter, setFilter, todos }) => {
   const buttonClasses = (currentFilter) =>
-    `flex items-center gap-2 px-4 py-2 rounded transition-colors duration-150 cursor-pointer ${
+    `inline-flex min-h-12 items-center gap-2 rounded-full border px-4 text-sm font-medium transition ${
       filter === currentFilter
-        ? "bg-blue-500 text-white"
-        : "bg-blue-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600"
+        ? "border-transparent bg-[linear-gradient(135deg,#157780_0%,#1f8d8d_100%)] text-white shadow-[0_18px_35px_rgba(21,119,128,0.22)]"
+        : "border-slate-200 bg-white/85 text-slate-700 hover:border-[rgba(21,119,128,0.24)] hover:text-[#0e6971] dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-[rgba(84,205,208,0.28)] dark:hover:text-[#8be4e6]"
     }`;
+
   return (
-    <div className="flex flex-row justify-center gap-2 mb-4">
-      <button
-        onClick={() => setFilter("all")}
-        className={buttonClasses("all")}
-        aria-label="Все задачи"
-      >
-        <MdOutlineFilterList size={18} />
-      </button>
-      <button
-        onClick={() => setFilter("active")}
-        className={buttonClasses("active")}
-        aria-label="Не выполненные"
-      >
-        <FaRegCircle size={16} />
-      </button>
-      <button
-        onClick={() => setFilter("completed")}
-        className={buttonClasses("completed")}
-        aria-label="Выполненные"
-      >
-        <FaCheckCircle size={16} />
-      </button>
+    <div className="flex gap-2 overflow-x-auto pb-1 sm:justify-end">
+      {FILTERS.map(({ id, label, icon, getCount }) => {
+        const IconComponent = icon;
+
+        return (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setFilter(id)}
+            className={buttonClasses(id)}
+            aria-label={label}
+          >
+            <IconComponent size={16} />
+            <span>{label}</span>
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs ${
+                filter === id
+                  ? "bg-white/20 text-white"
+                  : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300"
+              }`}
+            >
+              {getCount(todos)}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 };

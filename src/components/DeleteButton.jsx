@@ -1,8 +1,10 @@
 const DeleteButton = ({ onClick }) => {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all duration-300 cursor-pointer"
+      className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-transparent text-slate-400 opacity-100 transition hover:border-[rgba(181,38,54,0.16)] hover:bg-[rgba(181,38,54,0.08)] hover:text-[#8f1f2d] sm:opacity-0 sm:group-hover:opacity-100 dark:text-slate-500 dark:hover:border-[rgba(255,115,141,0.16)] dark:hover:bg-[rgba(181,38,54,0.14)] dark:hover:text-[#ffb1be]"
+      aria-label="Удалить задачу"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

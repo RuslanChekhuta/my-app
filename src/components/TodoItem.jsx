@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { RiDraggable } from "react-icons/ri";
 import CheckboxButton from "./CheckboxButton";
 import TodoEditForm from "./TodoEditForm";
 import TodoTextDisplay from "./TodoTextDisplay";
@@ -27,8 +28,8 @@ export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdate }) => {
       ? `translate(${transform.x}px, ${transform.y}px)`
       : undefined,
     transition,
-    zIndex: isDragging ? 1 : "auto",
-    opacity: isDragging ? 0.8 : 1,
+    zIndex: isDragging ? 20 : "auto",
+    opacity: isDragging ? 0.92 : 1,
   };
 
   const handleToggle = () => {
@@ -63,14 +64,22 @@ export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdate }) => {
       ref={setNodeRef}
       {...attributes}
       style={style}
-      className="group flex justify-between items-center gap-3 bg-white dark:bg-page-dark shadow-sm hover:shadow-md p-4 border border-gray-100 rounded-lg transition-shadow duration-300"
+      className={`group flex items-start justify-between gap-3 rounded-[1.5rem] border p-4 transition duration-300 sm:p-5 ${
+        todo.completed
+          ? "border-[rgba(21,119,128,0.14)] bg-[rgba(231,245,244,0.85)] shadow-[0_18px_50px_rgba(17,35,46,0.06)] dark:border-[rgba(84,205,208,0.14)] dark:bg-[rgba(13,36,42,0.72)]"
+          : "border-white/70 bg-white/90 shadow-[0_22px_55px_rgba(17,35,46,0.07)] hover:-translate-y-0.5 hover:shadow-[0_30px_70px_rgba(17,35,46,0.12)] dark:border-white/10 dark:bg-slate-950/72"
+      }`}
     >
-      <div className="flex flex-row items-center gap-2">
+      <div className="flex min-w-0 flex-1 items-start gap-3 sm:gap-4">
         <div
           {...listeners}
-          className="mx-0.5 border-gray-300 border-r-6 border-l-6 border-dotted w-4 h-6 cursor-grab active:cursor-grabbing"
-        ></div>
-        <div className="flex items-center gap-3">
+          className="mt-1 inline-flex h-10 w-10 shrink-0 cursor-grab items-center justify-center rounded-2xl border border-slate-200 bg-slate-50 text-slate-400 transition hover:border-[rgba(21,119,128,0.24)] hover:text-[#0e6971] active:cursor-grabbing dark:border-slate-800 dark:bg-slate-900/75 dark:text-slate-500 dark:hover:border-[rgba(84,205,208,0.24)] dark:hover:text-[#8be4e6]"
+          aria-label="Перетащить задачу"
+        >
+          <RiDraggable className="text-lg" />
+        </div>
+
+        <div className="flex min-w-0 flex-1 items-start gap-3">
           <CheckboxButton completed={todo.completed} onClick={handleToggle} />
           {isEditing ? (
             <TodoEditForm

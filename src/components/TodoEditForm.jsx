@@ -9,29 +9,30 @@ const TodoEditForm = ({
   onSave,
 }) => {
   return (
-    <div className="flex flex-col w-full gap-2 items-stretch" ref={innerRef}>
+    <div className="flex w-full flex-col gap-3" ref={innerRef}>
       <input
         type="text"
         value={editText}
         onChange={(e) => setEditText(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && onSave()}
-        className="w-full px-2 py-1 border-2 border-blue-500 rounded text-sm text-gray-700 dark:text-gray-300"
+        autoFocus
+        className="min-h-12 w-full rounded-2xl border border-[rgba(21,119,128,0.25)] bg-white/90 px-4 text-sm text-slate-800 outline-none transition focus:border-[rgba(21,119,128,0.5)] focus:ring-4 focus:ring-[rgba(21,119,128,0.12)] dark:border-[rgba(84,205,208,0.22)] dark:bg-slate-900/80 dark:text-slate-100 dark:focus:border-[rgba(84,205,208,0.4)] dark:focus:ring-[rgba(84,205,208,0.12)]"
       />
 
-      <div className="flex flex-col sm:flex-row gap-2 w-full">
+      <div className="flex w-full flex-col gap-2 sm:flex-row">
         <input
           type="datetime-local"
           value={editDeadline}
           onChange={(e) => setEditDeadline(e.target.value)}
-          className="w-full sm:flex-1 px-2 py-1 border-2 border-blue-500 rounded text-sm text-gray-700 dark:text-gray-300"
+          className="min-h-12 w-full rounded-2xl border border-[rgba(21,119,128,0.25)] bg-white/90 px-4 text-sm text-slate-800 outline-none transition focus:border-[rgba(21,119,128,0.5)] focus:ring-4 focus:ring-[rgba(21,119,128,0.12)] dark:border-[rgba(84,205,208,0.22)] dark:bg-slate-900/80 dark:text-slate-100 dark:focus:border-[rgba(84,205,208,0.4)] dark:focus:ring-[rgba(84,205,208,0.12)] sm:flex-1"
         />
         <button
+          type="button"
           onClick={onSave}
-          className="flex items-center justify-center gap-1 px-2 py-1 sm:px-3 sm:py-1 text-green-600 hover:text-green-800 cursor-pointer bg-white border-2 border-green-500 rounded hover:bg-green-50 transition-color text-sm sm:text-base"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-[rgba(21,119,128,0.22)] bg-[rgba(21,119,128,0.1)] px-4 text-sm font-semibold text-[#0e6971] transition hover:bg-[rgba(21,119,128,0.16)] dark:border-[rgba(84,205,208,0.22)] dark:bg-[rgba(84,205,208,0.12)] dark:text-[#8be4e6] dark:hover:bg-[rgba(84,205,208,0.18)] sm:px-5"
         >
           <CheckedIcon />
-          <span className="sm:hidden">OK</span>
-          <span className="hidden sm:inline">Готово</span>
+          <span>Сохранить</span>
         </button>
       </div>
     </div>
