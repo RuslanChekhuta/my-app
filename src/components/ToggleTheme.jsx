@@ -1,5 +1,3 @@
-import NetWorkProvider from "../providers/NetWorkProvider";
-import Notification from "./Notification";
 import { FaSun, FaMoon } from "react-icons/fa";
 
 const ToggleTheme = ({ toggleTheme, theme }) => {
@@ -18,9 +16,6 @@ const ToggleTheme = ({ toggleTheme, theme }) => {
           </div>
         </button>
       </div>
-      <NetWorkProvider>
-        <Notification />
-      </NetWorkProvider>
     </div>
   );
 };

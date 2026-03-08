@@ -6,6 +6,7 @@ import DeleteConfirmModal from "./components/DeleteConfirmModal";
 import { useTodoManagement } from "./hooks/useTodoManagement";
 import DeleteCompletedButton from "./components/DeleteCompletedButton";
 import Loader from "./components/Loader";
+import Notification from "./components/Notification";
 
 const MainContent = lazy(() => import("./components/MainContent"));
 
@@ -34,6 +35,7 @@ function App() {
       className="flex flex-col justify-center items-center bg-page-light dark:bg-page-dark p-6 min-h-screen"
     >
       <ToggleTheme toggleTheme={() => toggleTheme(setTheme)} theme={theme} />
+      <Notification />
       <Suspense fallback={<Loader />}>
         <MainContent
           onAdd={onAdd}
@@ -46,7 +48,7 @@ function App() {
       </Suspense>
 
       <DeleteConfirmModal
-        deletingId={deletingId}
+        isOpen={Boolean(deletingId)}
         onCancel={() => setDeletingId(null)}
         onConfirm={() => {
           handleDelete(deletingId);
@@ -56,7 +58,7 @@ function App() {
       />
 
       <DeleteConfirmModal
-        isDeletingCompleted={isDeletingCompleted}
+        isOpen={isDeletingCompleted}
         onCancel={() => setIsDeletingCompleted(false)}
         onConfirm={confirmDeleteCompleted}
         message={`Вы уверены, что хотите удалить все выполненные задачи (${

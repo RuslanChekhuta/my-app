@@ -1,103 +1,31 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import DeadlineBlock from "./DeadlineBlock";
 import PlusIcon from "./PlusIcon";
 import MicrophoneIcon from "../assets/microphone.png";
+import { useSpeechRecognition } from "../hooks/useSpeechRecognition";
 
 export function AddTodo({ onAdd }) {
   const [text, setText] = useState("");
   const [deadline, setDeadline] = useState("");
   const [showDeadlineInput, setShowDeadlineInput] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [recognition, setRecognition] = useState(null);
-  const finalTextRef = useRef("");
+  const { isSupported, isListening, speechError, resetTranscript, toggleListening } =
+    useSpeechRecognition({
+      onTranscriptChange: setText,
+    });
 
-  const startListening = () => {
-    if (recognition) {
-      recognition.start();
-      setIsListening(true);
-    }
-  };
-
-  const stopListening = () => {
-    if (recognition) {
-      recognition.stop();
-      setIsListening(false);
-      setText(finalTextRef.current);
-    }
-  };
-
-  const toggleListening = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening();
-    }
-  };
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        const recognitionInstance = new SpeechRecognition();
-        recognitionInstance.continuous = true;
-        recognitionInstance.lang = "ru-RU";
-        recognitionInstance.interimResults = true;
-
-        recognitionInstance.onresult = (event) => {
-          let finalTranscript = "";
-          let interimScript = "";
-          for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-              finalTranscript += transcript;
-            } else {
-              interimScript += transcript;
-            }
-            console.log("Финал", finalTranscript);
-            console.log("Промежуточный", interimScript);
-
-            if (finalTranscript) {
-              finalTextRef.current =
-                finalTextRef.current + " " + finalTranscript;
-              setText(finalTextRef.current);
-            } else if (interimScript) {
-              setText(finalTextRef.current + " " + interimScript);
-            }
-          }
-        };
-
-        recognitionInstance.onerror = (event) => {
-          console.error("Ошибка распознавания:", event.error);
-          stopListening();
-        };
-
-        recognitionInstance.onend = () => {
-          if (isListening) {
-            recognitionInstance.start();
-          }
-        };
-
-        setRecognition(recognitionInstance);
-      }
-    }
-
-    return () => {
-      if (recognition) {
-        recognition.stop();
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isListening]);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (text.trim()) {
-      onAdd(text, deadline);
+      const isAdded = await onAdd(text.trim(), deadline);
+
+      if (!isAdded) {
+        return;
+      }
+
       setText("");
       setDeadline("");
-      setShowDeadlineInput("");
-      finalTextRef.current = "";
+      setShowDeadlineInput(false);
+      resetTranscript();
     } else {
       alert("Введите текст задачи");
     }
@@ -113,18 +41,27 @@ export function AddTodo({ onAdd }) {
             setText(e.target.value);
           }}
           placeholder="Добавить задачу..."
-          className="flex-1 p-3 outline-none text-gray-200 placeholder-gray-400"
+          className="flex-1 p-3 text-gray-700 outline-none placeholder-gray-400 dark:text-gray-200"
         />
         <div className="flex justify-end max-[374px]:justify-center items-center border-1 min-[375px]:border-0 w-full">
           <button
             type="button"
-            onClick={toggleListening}
+            onClick={() => toggleListening(text)}
+            disabled={!isSupported}
             className={`cursor-pointer p-3 ${
-              isListening
+              !isSupported
+                ? "cursor-not-allowed bg-gray-200 opacity-60 dark:bg-gray-600"
+                : isListening
                 ? "bg-red-500 hover:bg-red-700"
                 : "bg-gray-200 hover:bg-gray-300 dark:bg-gray-500 hover:dark:bg-gray-700"
             }  transition-colors duration-300 flex items-center justify-center`}
-            title={isListening ? "Остановить запись" : "Начать запись голоса"}
+            title={
+              !isSupported
+                ? "Голосовой ввод недоступен"
+                : isListening
+                  ? "Остановить запись"
+                  : "Начать запись голоса"
+            }
           >
             <img
               src={MicrophoneIcon}
@@ -153,6 +90,16 @@ export function AddTodo({ onAdd }) {
         setDeadline={setDeadline}
         setShowDeadlineInput={setShowDeadlineInput}
       />
+      {!isSupported && (
+        <div className="mt-2 text-sm text-amber-600 dark:text-amber-400">
+          Голосовой ввод не поддерживается в этом браузере.
+        </div>
+      )}
+      {speechError && isSupported && (
+        <div className="mt-2 text-sm text-red-600 dark:text-red-400">
+          {speechError}
+        </div>
+      )}
       {isListening && (
         <div className="flex items-center mt-2 text-blue-500 text-sm">
           <div className="bg-red-500 mr-2 rounded-full w-3 h-3 animate-pulse"></div>

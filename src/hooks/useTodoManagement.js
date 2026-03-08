@@ -3,6 +3,7 @@ import { useLocalStorage } from "./useLocalStorage.js";
 import { useTodoApi } from "./useTodoApi.js";
 import { useTodoHelpers } from "./useTodoHelpers.js";
 import { useTodoActions } from "./useTodoActions.js";
+import { useNetworkStatus } from "./useNetworkStatus.js";
 
 export const useTodoManagement = () => {
   const [todos, setTodos] = useState([]);
@@ -12,16 +13,23 @@ export const useTodoManagement = () => {
   const { fetchTodos, createTodo, updateTodo, deleteTodo } = useTodoApi();
   const {
     createNewTodo,
+    getNextTodoOrder,
     sortedSavedTodos,
     toggleTodoCompletion,
     updateTodoData,
   } = useTodoHelpers();
+  const { isOnline, showOfflineMessage, showRequestError } =
+    useNetworkStatus();
 
   useEffect(() => {
     const loadInitialData = async () => {
       const savedTodos = sortedSavedTodos(loadFromLocalStorage());
 
       setTodos(savedTodos);
+
+      if (!isOnline) {
+        return;
+      }
 
       try {
         const serverTodos = await fetchTodos();
@@ -30,16 +38,25 @@ export const useTodoManagement = () => {
         saveToLocalStorage(sortedServerTodos);
       } catch (error) {
         console.error("Ошибка загрузки данных:", error);
+        showRequestError("Не удалось загрузить задачи с сервера.");
       }
     };
+
     loadInitialData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [
+    fetchTodos,
+    isOnline,
+    loadFromLocalStorage,
+    saveToLocalStorage,
+    showRequestError,
+    sortedSavedTodos,
+  ]);
 
   const actions = useTodoActions({
     todos,
     setTodos,
     createNewTodo,
+    getNextTodoOrder,
     createTodo,
     saveToLocalStorage,
     updateTodo,
@@ -47,6 +64,9 @@ export const useTodoManagement = () => {
     toggleTodoCompletion,
     deleteTodo,
     setIsDeletingCompleted,
+    isOnline,
+    showOfflineMessage,
+    showRequestError,
   });
 
   return {
