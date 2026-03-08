@@ -10,19 +10,6 @@ export function AddTodo({ onAdd }) {
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const finalTextRef = useRef("");
-  // const inputRef = useRef(null); // Добавляем ref для input
-
-  // // Функция для перемещения курсора в конец input
-  // const moveCursorToEnd = () => {
-  //   if (inputRef.current) {
-  //     inputRef.current.focus();
-  //     const length = inputRef.current.value.length;
-  //     inputRef.current.setSelectionRange(length, length);
-
-  //     // Прокручиваем input до конца, если текст не помещается
-  //     inputRef.current.scrollLeft = inputRef.current.scrollWidth;
-  //   }
-  // };
 
   const startListening = () => {
     if (recognition) {
@@ -36,7 +23,6 @@ export function AddTodo({ onAdd }) {
       recognition.stop();
       setIsListening(false);
       setText(finalTextRef.current);
-      // moveCursorToEnd(); // Перемещаем курсор в конец при остановке записи
     }
   };
 
@@ -79,7 +65,6 @@ export function AddTodo({ onAdd }) {
               setText(finalTextRef.current + " " + interimScript);
             }
           }
-          // moveCursorToEnd(); // Перемещаем курсор в конец при каждом обновлении текста
         };
 
         recognitionInstance.onerror = (event) => {
@@ -113,51 +98,54 @@ export function AddTodo({ onAdd }) {
       setDeadline("");
       setShowDeadlineInput("");
       finalTextRef.current = "";
+    } else {
+      alert("Введите текст задачи");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="mb-6">
-      <div className="flex items-center bg-white dark:bg-page-dark shadow-sm border border-gray-100 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 overflow-hidden">
+      <div className="flex min-[375px]:flex-row flex-col items-center bg-white dark:bg-page-dark shadow-sm border border-gray-100 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 overflow-hidden dark:text-txt-dark">
         <input
           type="text"
           value={text}
           onChange={(e) => {
             setText(e.target.value);
           }}
-          // ref={inputRef} // Добавляем ref к input
           placeholder="Добавить задачу..."
-          className="flex-1 dark:bg-page-dark p-3 outline-none text-gray-200 dark:text-txt-dark placeholder-gray-400"
+          className="flex-1 p-3 outline-none text-gray-200 placeholder-gray-400"
         />
-        <button
-          type="button"
-          onClick={toggleListening}
-          className={`cursor-pointer p-1 rounded-full ${
-            isListening
-              ? "bg-red-500 hover:bg-red-700"
-              : "bg-gray-200 hover:bg-gray-300"
-          }  transition-colors duration-300 flex items-center justify-center`}
-          title={isListening ? "Остановить запись" : "Начать запись голоса"}
-        >
-          <img
-            src={MicrophoneIcon}
-            alt="Микрофон"
-            className={`w-8 h-8 ${
-              isListening ? "filter brightness-0 invert" : ""
-            }`}
-          />
-        </button>
-        <button
-          type="submit"
-          className={`p-3 ${
-            isListening
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-btn-light hover:bg-btn-light-hv cursor-pointer"
-          }  text-white dark:bg-btn-dark hover:dark:bg-btn-dark-hv transition-colors duration-300 `}
-          disabled={isListening}
-        >
-          <PlusIcon />
-        </button>
+        <div className="flex justify-end max-[374px]:justify-center items-center border-1 min-[375px]:border-0 w-full">
+          <button
+            type="button"
+            onClick={toggleListening}
+            className={`cursor-pointer p-3 ${
+              isListening
+                ? "bg-red-500 hover:bg-red-700"
+                : "bg-gray-200 hover:bg-gray-300 dark:bg-gray-500 hover:dark:bg-gray-700"
+            }  transition-colors duration-300 flex items-center justify-center`}
+            title={isListening ? "Остановить запись" : "Начать запись голоса"}
+          >
+            <img
+              src={MicrophoneIcon}
+              alt="Микрофон"
+              className={`w-6 h-6 ${
+                isListening ? "filter brightness-0 invert" : ""
+              }`}
+            />
+          </button>
+          <button
+            type="submit"
+            className={`p-3 ${
+              isListening
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-btn-light hover:bg-btn-light-hv cursor-pointer"
+            }  text-white dark:bg-btn-dark hover:dark:bg-btn-dark-hv transition-colors duration-300 `}
+            disabled={isListening}
+          >
+            <PlusIcon />
+          </button>
+        </div>
       </div>
       <DeadlineBlock
         showDeadlineInput={showDeadlineInput}

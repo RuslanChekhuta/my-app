@@ -63,28 +63,30 @@ export const TodoItem = ({ todo, onDelete, onToggleComplete, onUpdate }) => {
       ref={setNodeRef}
       {...attributes}
       style={style}
-      className="group flex items-center 
-    justify-between p-4 gap-3 bg-white dark:bg-page-dark rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100"
+      className="group flex justify-between items-center gap-3 bg-white dark:bg-page-dark shadow-sm hover:shadow-md p-4 border border-gray-100 rounded-lg transition-shadow duration-300"
     >
-      <div
-        {...listeners}
-        className="h-6 w-4 border-l-6 border-r-6 border-gray-300 border-dotted mx-0.5 cursor-grab active:cursor-grabbing"
-      ></div>
-      <div className="flex items-center gap-3">
-        <CheckboxButton completed={todo.completed} onClick={handleToggle} />
-        {isEditing ? (
-          <TodoEditForm
-            editText={editText}
-            setEditText={setEditText}
-            editDeadline={editDeadline}
-            setEditDeadline={setEditDeadline}
-            innerRef={editFormRef}
-            onSave={handleSave}
-          />
-        ) : (
-          <TodoTextDisplay todo={todo} setIsEditing={setIsEditing} />
-        )}
+      <div className="flex flex-row items-center gap-2">
+        <div
+          {...listeners}
+          className="mx-0.5 border-gray-300 border-r-6 border-l-6 border-dotted w-4 h-6 cursor-grab active:cursor-grabbing"
+        ></div>
+        <div className="flex items-center gap-3">
+          <CheckboxButton completed={todo.completed} onClick={handleToggle} />
+          {isEditing ? (
+            <TodoEditForm
+              editText={editText}
+              setEditText={setEditText}
+              editDeadline={editDeadline}
+              setEditDeadline={setEditDeadline}
+              innerRef={editFormRef}
+              onSave={handleSave}
+            />
+          ) : (
+            <TodoTextDisplay todo={todo} setIsEditing={setIsEditing} />
+          )}
+        </div>
       </div>
+
       <DeleteButton onClick={() => onDelete(todo.id)} />
     </div>
   );
