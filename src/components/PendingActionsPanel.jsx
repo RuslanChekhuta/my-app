@@ -4,6 +4,9 @@ import {
   RiShieldCheckLine,
 } from "react-icons/ri";
 import { CONFLICT_STRATEGIES } from "../constants/todos";
+import EyebrowChip from "./ui/EyebrowChip";
+import GlassPanel from "./ui/GlassPanel";
+import MetricCard from "./ui/MetricCard";
 
 const ACTION_LABELS = {
   create: "Создание",
@@ -30,13 +33,10 @@ const PendingActionsPanel = ({
   setConflictStrategy,
 }) => {
   return (
-    <section className="rounded-[1.75rem] border border-white/70 bg-white/82 p-4 shadow-[0_30px_100px_rgba(17,35,46,0.09)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/65 sm:p-5">
+    <GlassPanel className="p-4 shadow-[0_30px_100px_rgba(17,35,46,0.09)] sm:p-5">
       <div className="flex flex-col gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(21,119,128,0.16)] bg-[rgba(21,119,128,0.08)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#0e6971] dark:border-[rgba(84,205,208,0.18)] dark:bg-[rgba(84,205,208,0.1)] dark:text-[#8be4e6]">
-            <RiCloudLine className="text-sm" />
-            Sync Deck
-          </div>
+          <EyebrowChip icon={RiCloudLine}>Центр синхронизации</EyebrowChip>
 
           <h2 className="display-font mt-3 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
             Очередь синхронизации
@@ -51,34 +51,28 @@ const PendingActionsPanel = ({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-2xl border border-slate-200 bg-[rgba(248,246,242,0.8)] p-3 dark:border-slate-800 dark:bg-slate-900/70">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-              Queue
-            </p>
-            <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-50">
-              {pendingActions.length}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-[rgba(248,246,242,0.8)] p-3 dark:border-slate-800 dark:bg-slate-900/70">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-              Status
-            </p>
-            <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-50">
-              {isSyncingPending ? "Сейчас идёт sync" : "Ожидание"}
-            </p>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-[rgba(248,246,242,0.8)] p-3 dark:border-slate-800 dark:bg-slate-900/70">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
-              Strategy
-            </p>
-            <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-50">
-              {conflictStrategy === CONFLICT_STRATEGIES.LOCAL_WINS
-                ? "Local wins"
-                : "Server wins"}
-            </p>
-          </div>
+          <MetricCard
+            label="Очередь"
+            value={pendingActions.length}
+            className="bg-[rgba(248,246,242,0.8)] p-3 dark:border-slate-800 dark:bg-slate-900/70"
+            valueClassName="mt-2 text-2xl font-semibold"
+          />
+          <MetricCard
+            label="Статус"
+            value={isSyncingPending ? "Идёт синхронизация" : "Ожидание"}
+            className="bg-[rgba(248,246,242,0.8)] p-3 dark:border-slate-800 dark:bg-slate-900/70"
+            valueClassName="mt-2 text-sm font-semibold"
+          />
+          <MetricCard
+            label="Стратегия"
+            value={
+              conflictStrategy === CONFLICT_STRATEGIES.LOCAL_WINS
+                ? "Локальная версия"
+                : "Серверная версия"
+            }
+            className="bg-[rgba(248,246,242,0.8)] p-3 dark:border-slate-800 dark:bg-slate-900/70"
+            valueClassName="mt-2 text-sm font-semibold"
+          />
         </div>
 
         <label className="flex flex-col gap-1 text-sm text-slate-700 dark:text-slate-200">
@@ -115,10 +109,13 @@ const PendingActionsPanel = ({
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 dark:border-slate-700 dark:bg-slate-950/70 dark:text-slate-300">
-                      <RiArrowUpCircleLine className="text-sm" />
+                    <EyebrowChip
+                      icon={RiArrowUpCircleLine}
+                      tone="neutral"
+                      className="tracking-[0.18em]"
+                    >
                       {ACTION_LABELS[action.type] ?? action.type}
-                    </span>
+                    </EyebrowChip>
                     <p className="mt-3 text-sm font-semibold leading-6 text-slate-900 dark:text-slate-100">
                       {getPendingItemTitle(action)}
                     </p>
@@ -146,7 +143,7 @@ const PendingActionsPanel = ({
           ))
         )}
       </div>
-    </section>
+    </GlassPanel>
   );
 };
 

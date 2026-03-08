@@ -7,6 +7,8 @@ import {
   RiSparklingLine,
 } from "react-icons/ri";
 import DeadlineBlock from "./DeadlineBlock";
+import EyebrowChip from "./ui/EyebrowChip";
+import GlassPanel from "./ui/GlassPanel";
 import { useSpeechRecognition } from "../hooks/useSpeechRecognition";
 
 export function AddTodo({ onAdd }) {
@@ -52,16 +54,14 @@ export function AddTodo({ onAdd }) {
   };
 
   return (
-    <form
+    <GlassPanel
+      as="form"
       onSubmit={handleSubmit}
-      className="overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/82 p-4 shadow-[0_30px_100px_rgba(17,35,46,0.12)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/68 sm:p-5"
+      className="p-4 shadow-[0_30px_100px_rgba(17,35,46,0.12)] sm:p-5"
     >
       <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(21,119,128,0.18)] bg-[rgba(21,119,128,0.09)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#0e6971] dark:border-[rgba(84,205,208,0.2)] dark:bg-[rgba(84,205,208,0.08)] dark:text-[#8be4e6]">
-            <RiSparklingLine className="text-sm" />
-            Capture fast
-          </div>
+          <EyebrowChip icon={RiSparklingLine}>Быстрый ввод</EyebrowChip>
 
           <h2 className="display-font mt-3 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 sm:text-[2rem]">
             Добавьте следующую важную задачу
@@ -75,10 +75,10 @@ export function AddTodo({ onAdd }) {
 
         <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300">
           <span className="rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 dark:border-slate-700 dark:bg-slate-900/70">
-            Voice input
+            Голосовой ввод
           </span>
           <span className="rounded-full border border-slate-200 bg-white/80 px-3 py-1.5 dark:border-slate-700 dark:bg-slate-900/70">
-            Offline queue
+            Локальная очередь
           </span>
           {deadline && (
             <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(229,122,74,0.18)] bg-[rgba(229,122,74,0.12)] px-3 py-1.5 text-[#a74f28] dark:border-[rgba(255,173,139,0.24)] dark:bg-[rgba(229,122,74,0.14)] dark:text-[#ffc7af]">
@@ -106,7 +106,7 @@ export function AddTodo({ onAdd }) {
                 setInputError("");
               }
             }}
-            placeholder="Например: подготовить weekly review и созвон с командой"
+            placeholder="Например: подготовить обзор недели и созвон с командой"
             className="min-h-14 w-full rounded-[1.35rem] border border-slate-200 bg-[rgba(255,255,255,0.85)] px-4 pr-12 text-[15px] text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[rgba(21,119,128,0.5)] focus:ring-4 focus:ring-[rgba(21,119,128,0.12)] dark:border-slate-800 dark:bg-slate-900/75 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-[rgba(84,205,208,0.45)] dark:focus:ring-[rgba(84,205,208,0.12)]"
           />
           <RiArrowRightUpLine className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-lg text-slate-300 transition group-focus-within:text-[#0e6971] dark:text-slate-600 dark:group-focus-within:text-[#8be4e6]" />
@@ -189,6 +189,6 @@ export function AddTodo({ onAdd }) {
           <span>Идет запись. Нажмите на кнопку микрофона для остановки.</span>
         </div>
       )}
-    </form>
+    </GlassPanel>
   );
 }

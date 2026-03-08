@@ -1,4 +1,6 @@
 import { useEffect } from "react";
+import EyebrowChip from "./ui/EyebrowChip";
+import GlassPanel from "./ui/GlassPanel";
 
 const DeleteConfirmModal = ({ isOpen, onCancel, onConfirm, message }) => {
   useEffect(() => {
@@ -25,17 +27,16 @@ const DeleteConfirmModal = ({ isOpen, onCancel, onConfirm, message }) => {
       onClick={onCancel}
     >
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-      <div
+      <GlassPanel
+        as="div"
         role="dialog"
         aria-modal="true"
-        className="relative mx-4 w-full max-w-md overflow-hidden rounded-[2rem] border border-white/70 bg-white/90 p-6 text-slate-800 shadow-[0_35px_90px_rgba(17,35,46,0.28)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/90 dark:text-white"
+        className="relative mx-4 w-full max-w-md rounded-[2rem] bg-white/90 p-6 text-slate-800 shadow-[0_35px_90px_rgba(17,35,46,0.28)] dark:bg-slate-950/90 dark:text-white"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="absolute top-0 right-0 h-32 w-32 rounded-full bg-[rgba(229,122,74,0.18)] blur-3xl"></div>
         <div className="relative">
-          <div className="inline-flex items-center rounded-full border border-[rgba(181,38,54,0.16)] bg-[rgba(181,38,54,0.08)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8f1f2d] dark:border-[rgba(255,115,141,0.16)] dark:bg-[rgba(181,38,54,0.14)] dark:text-[#ffb1be]">
-            Delete check
-          </div>
+          <EyebrowChip tone="danger">Подтверждение</EyebrowChip>
 
           <h3 className="display-font mt-4 text-3xl font-semibold tracking-tight">
             Подтверждение удаления
@@ -61,7 +62,7 @@ const DeleteConfirmModal = ({ isOpen, onCancel, onConfirm, message }) => {
             Удалить
           </button>
         </div>
-      </div>
+      </GlassPanel>
     </div>
   );
 };

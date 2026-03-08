@@ -5,6 +5,8 @@ import TodoList from "./TodoList";
 import TodoFilter from "./TodoFilter";
 import PendingActionsBadge from "./PendingActionsBadge";
 import PendingActionsPanel from "./PendingActionsPanel";
+import EyebrowChip from "./ui/EyebrowChip";
+import GlassPanel from "./ui/GlassPanel";
 
 const MainContent = ({
   onAdd,
@@ -39,19 +41,17 @@ const MainContent = ({
         <section className="space-y-5">
           <AddTodo onAdd={onAdd} />
 
-          <div className="overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/80 p-4 shadow-[0_30px_100px_rgba(17,35,46,0.09)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/65 sm:p-5">
+          <GlassPanel className="p-4 shadow-[0_30px_100px_rgba(17,35,46,0.09)] sm:p-5">
             <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                  Task Flow
-                </p>
+                <EyebrowChip tone="neutral">Рабочий поток</EyebrowChip>
                 <h2 className="display-font mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
                   Сфокусированная рабочая лента
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
                   Добавляйте, сортируйте и редактируйте задачи в одном
                   пространстве. Интерфейс подстраивается под мобильный экран и
-                  широкий desktop без отдельной логики.
+                  широкий экран без отдельной логики.
                 </p>
               </div>
 
@@ -66,7 +66,7 @@ const MainContent = ({
               onReorder={onReorder}
               filter={filter}
             />
-          </div>
+          </GlassPanel>
         </section>
 
         <aside className="space-y-4 xl:sticky xl:top-5">

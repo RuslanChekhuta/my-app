@@ -1,14 +1,18 @@
 import { FaSun, FaMoon } from "react-icons/fa";
+import GlassPanel from "./ui/GlassPanel";
 
 const ToggleTheme = ({ toggleTheme, theme }) => {
   return (
-    <div className="inline-flex items-center gap-3 rounded-full border border-white/70 bg-white/75 px-3 py-2 shadow-lg shadow-slate-900/5 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/70">
+    <GlassPanel
+      as="div"
+      className="inline-flex rounded-full bg-white/75 px-3 py-2 shadow-lg shadow-slate-900/5"
+    >
       <div className="hidden text-right sm:block">
         <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500 dark:text-slate-400">
-          Interface
+          Интерфейс
         </p>
         <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-          {theme === "light" ? "Day Shift" : "Night Shift"}
+          {theme === "light" ? "Дневной режим" : "Ночной режим"}
         </p>
       </div>
 
@@ -26,7 +30,7 @@ const ToggleTheme = ({ toggleTheme, theme }) => {
           )}
         </div>
       </button>
-    </div>
+    </GlassPanel>
   );
 };
 

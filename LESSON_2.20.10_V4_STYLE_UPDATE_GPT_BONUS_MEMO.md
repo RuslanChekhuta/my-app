@@ -27,6 +27,15 @@
 - интерфейс получил идентичность;
 - приложение ощущается не как generic todo, а как отдельный инструмент.
 
+### Общие UI-абстракции
+
+В [GlassPanel.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/GlassPanel.jsx), [EyebrowChip.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/EyebrowChip.jsx) и [MetricCard.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ui/MetricCard.jsx) вынесены повторяющиеся visual-patterns, а [cn.js](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/helpers/cn.js) даёт простой helper для сборки классов.
+
+Это важно, потому что:
+- стеклянные панели больше не дублируются вручную в каждом компоненте;
+- маленькие фирменные label-чипы и stat-cards теперь задаются единым способом;
+- дальше интерфейс можно расширять быстрее и без хаотичного копирования Tailwind-цепочек.
+
 ### Новая типографика и базовая тема
 
 В [index.css](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/index.css):
@@ -71,7 +80,7 @@
 В [Header.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/Header.jsx):
 - появился hero-блок;
 - добавлены stat-cards;
-- используется фирменная подпись `Voice-ready. Offline-first. Conflict-aware.`;
+- используется фирменная подпись `Голосовой ввод. Работа офлайн. Контроль конфликтов.`;
 - есть декоративный знак `S` и продуктовый слоган.
 
 Это уже не просто заголовок страницы, а entrance screen для всего продукта.
@@ -80,7 +89,7 @@
 
 В [AddTodo.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/AddTodo.jsx):
 - форма превращена в полноценную capture-card;
-- добавлены micro-labels вроде `Capture fast`;
+- добавлены micro-labels вроде `Быстрый ввод`;
 - кнопки переосмыслены через `react-icons`, а не старые svg-иконки;
 - дедлайн визуально показывается как badge;
 - ошибки и статус записи стилизованы как системные сообщения;
@@ -124,7 +133,7 @@
 
 В [PendingActionsPanel.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/PendingActionsPanel.jsx):
 - очередь sync превращена в полноценную боковую панель;
-- видны queue/status/strategy карточки;
+- видны карточки очереди, статуса и стратегии;
 - есть select для `conflictStrategy`;
 - каждый pending action визуализируется как карточка со статусом;
 - snapshot conflict context теперь считывается глазами, а не только из кода.
@@ -138,7 +147,7 @@
 
 В [ToggleTheme.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ToggleTheme.jsx):
 - тумблер стал частью общей визуальной системы;
-- появились текстовые подписи `Day Shift / Night Shift`;
+- появились текстовые подписи `Дневной режим / Ночной режим`;
 - компонент выглядит как control-card, а не как isolated switch.
 
 ### Notification
@@ -184,18 +193,13 @@
 
 ## 9) Технические замечания по текущему style update
 
-- В интерфейсе смешиваются русский и английский тексты:
-  - `Capture fast`
-  - `Task Flow`
-  - `Sync Deck`
-  - `Day Shift`
-  - `Night Shift`
-  Это можно оставить как стилистический приём, но лучше решить, это сознательная bilingual-подача или просто промежуточное состояние.
+- Интерфейс приведён к единой русской подаче, а английским оставлен только бренд `Signal Tasks`.
+  Это убирает ощущение промежуточного bilingual-state и делает UI цельнее.
 
 - В [index.css](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/index.css) шрифты подключены через `@import` из Google Fonts, что может влиять на скорость первого рендера.
 
-- В компонентах стало много длинных Tailwind-классов.
-  Это плата за выразительный UI; если проект будет расти дальше, можно подумать о выносе повторяющихся patterns в utility-компоненты.
+- Повторяющиеся visual-patterns уже частично вынесены в `GlassPanel`, `EyebrowChip` и `MetricCard`.
+  Это снизило дублирование, но при дальнейшем росте UI можно продолжить выносить и другие повторяющиеся структуры.
 
 - `PendingActionsPanel` и hero-layout выглядят сильно, но на очень маленьких экранах стоит отдельно проверить плотность контента руками в браузере.
 
@@ -231,8 +235,8 @@
 - [x] Улучшены empty state, loader, notification и modal.
 - [x] ToggleTheme встроен в общий визуальный язык.
 - [x] Сложная sync-логика стала понятнее через UI.
-- [ ] Можно унифицировать язык интерфейса.
-- [ ] Можно вынести повторяющиеся visual patterns в общие abstractions.
+- [x] Унифицирован язык интерфейса.
+- [x] Повторяющиеся visual patterns вынесены в общие abstractions.
 
 ---
 
