@@ -11,6 +11,7 @@ const TONE_CLASSES = {
     "border-[rgba(181,38,54,0.18)] bg-[rgba(181,38,54,0.08)] text-[#8f1f2d] dark:border-[rgba(255,115,141,0.2)] dark:bg-[rgba(181,38,54,0.14)] dark:text-[#ffb1be]",
   muted:
     "border-slate-200 bg-slate-100 text-slate-500 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-400",
+  inverted: "border-white/15 bg-white/20 text-white",
 };
 
 const DOT_TONE_CLASSES = {
@@ -19,6 +20,7 @@ const DOT_TONE_CLASSES = {
   warm: "bg-[#e57a4a]",
   danger: "bg-[#c23647]",
   muted: "bg-slate-400 dark:bg-slate-600",
+  inverted: "bg-white",
 };
 
 const StatusPill = ({

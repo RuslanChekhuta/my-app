@@ -1,12 +1,15 @@
+import Button from "./ui/Button";
+
 const CheckboxButton = ({ completed, onClick }) => {
   return (
-    <button
-      type="button"
+    <Button
       onClick={onClick}
-      className={`mt-1 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border cursor-pointer transition ${
+      variant={completed ? "primary" : "secondary"}
+      size="icon"
+      className={`mt-1 shrink-0 ${
         completed
-          ? "border-[rgba(21,119,128,0.32)] bg-[linear-gradient(135deg,#157780_0%,#1f8d8d_100%)] text-white shadow-[0_14px_32px_rgba(21,119,128,0.22)]"
-          : "border-slate-200 bg-white/90 text-transparent hover:border-[rgba(21,119,128,0.26)] dark:border-slate-700 dark:bg-slate-900/75"
+          ? "border-[rgba(21,119,128,0.32)] shadow-[0_14px_32px_rgba(21,119,128,0.22)]"
+          : "bg-white/90 text-transparent dark:border-slate-700 dark:bg-slate-900/75"
       }`}
       aria-label={
         completed ? "Отметить как невыполненную" : "Отметить как выполненную"
@@ -26,7 +29,7 @@ const CheckboxButton = ({ completed, onClick }) => {
           d="M5 13l4 4L19 7"
         />
       </svg>
-    </button>
+    </Button>
   );
 };
 

@@ -48,7 +48,7 @@ const TodoList = ({
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={todoIds} strategy={verticalListSortingStrategy}>
-        <div className="flex flex-col gap-3">
+        <div className="motion-list flex flex-col gap-3">
           {todos.map((todo) => (
             <TodoItem
               key={todo.id}

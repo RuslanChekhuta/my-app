@@ -25,11 +25,17 @@ const SIZE_CLASSES = {
   icon: "h-11 w-11 rounded-2xl p-0 text-sm",
 };
 
+const SELECTED_CLASSES = {
+  secondary:
+    "border-transparent bg-[linear-gradient(135deg,#157780_0%,#1f8d8d_100%)] text-white shadow-[0_18px_35px_rgba(21,119,128,0.22)] dark:bg-[linear-gradient(135deg,#1f8d8d_0%,#40a9aa_100%)]",
+};
+
 const Button = ({
   as = "button",
   type = "button",
   variant = "secondary",
   size = "md",
+  selected = false,
   className = "",
   children,
   disabled = false,
@@ -40,6 +46,7 @@ const Button = ({
       "inline-flex items-center justify-center gap-2 border font-semibold transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 motion-press",
       VARIANT_CLASSES[variant] ?? VARIANT_CLASSES.secondary,
       SIZE_CLASSES[size] ?? SIZE_CLASSES.md,
+      selected && (SELECTED_CLASSES[variant] ?? SELECTED_CLASSES.secondary),
       className
     ),
     disabled,

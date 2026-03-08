@@ -1,5 +1,7 @@
 import { FaCheckCircle, FaRegCircle } from "react-icons/fa";
 import { MdOutlineFilterList } from "react-icons/md";
+import Button from "./ui/Button";
+import StatusPill from "./ui/StatusPill";
 
 const FILTERS = [
   {
@@ -23,38 +25,30 @@ const FILTERS = [
 ];
 
 const TodoFilter = ({ filter, setFilter, todos }) => {
-  const buttonClasses = (currentFilter) =>
-    `inline-flex min-h-12 items-center gap-2 rounded-full border px-4 text-sm font-medium transition ${
-      filter === currentFilter
-        ? "border-transparent bg-[linear-gradient(135deg,#157780_0%,#1f8d8d_100%)] text-white shadow-[0_18px_35px_rgba(21,119,128,0.22)]"
-        : "border-slate-200 bg-white/85 text-slate-700 hover:border-[rgba(21,119,128,0.24)] hover:text-[#0e6971] dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-[rgba(84,205,208,0.28)] dark:hover:text-[#8be4e6]"
-    }`;
-
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 sm:justify-end">
+    <div className="motion-fade-up motion-delay-2 flex gap-2 overflow-x-auto pb-1 sm:justify-end">
       {FILTERS.map(({ id, label, icon, getCount }) => {
         const IconComponent = icon;
+        const isSelected = filter === id;
 
         return (
-          <button
+          <Button
             key={id}
-            type="button"
             onClick={() => setFilter(id)}
-            className={buttonClasses(id)}
+            variant="secondary"
+            size="md"
+            selected={isSelected}
             aria-label={label}
           >
             <IconComponent size={16} />
             <span>{label}</span>
-            <span
-              className={`rounded-full px-2 py-0.5 text-xs ${
-                filter === id
-                  ? "bg-white/20 text-white"
-                  : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300"
-              }`}
+            <StatusPill
+              tone={isSelected ? "inverted" : "muted"}
+              className="px-2 py-0.5 text-[11px]"
             >
               {getCount(todos)}
-            </span>
-          </button>
+            </StatusPill>
+          </Button>
         );
       })}
     </div>
