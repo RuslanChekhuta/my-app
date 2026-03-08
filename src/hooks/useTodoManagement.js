@@ -7,10 +7,15 @@ import {
   updateTodo,
 } from "../api/todoApi.js";
 import {
+  discardPendingActionsForTodoId,
   loadPendingActions,
   remapPendingActionTodoId,
   savePendingActions,
 } from "../helpers/offlineTodoQueue.js";
+import {
+  loadConflictStrategy,
+  saveConflictStrategy,
+} from "../helpers/syncPreferences.js";
 import { loadFromLocalStorage, saveToLocalStorage } from "../helpers/storage.js";
 import {
   createNewTodo,
@@ -22,6 +27,7 @@ import {
 } from "../helpers/todoHelpers.js";
 import { useTodoActions } from "./useTodoActions.js";
 import { useNetworkStatus } from "./useNetworkStatus.js";
+import { CONFLICT_STRATEGIES } from "../constants/todos";
 
 export const useTodoManagement = () => {
   const [todos, setTodos] = useState([]);
@@ -29,6 +35,7 @@ export const useTodoManagement = () => {
   const [isDeletingCompleted, setIsDeletingCompleted] = useState(false);
   const [pendingActions, setPendingActions] = useState(loadPendingActions);
   const [isSyncingPending, setIsSyncingPending] = useState(false);
+  const [conflictStrategy, setConflictStrategy] = useState(loadConflictStrategy);
   const todosRef = useRef([]);
   const isSyncingPendingRef = useRef(false);
   const { isOnline, showInfoMessage, showRequestError, showSuccessMessage } =
@@ -41,6 +48,10 @@ export const useTodoManagement = () => {
   useEffect(() => {
     savePendingActions(pendingActions);
   }, [pendingActions]);
+
+  useEffect(() => {
+    saveConflictStrategy(conflictStrategy);
+  }, [conflictStrategy]);
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -98,9 +109,15 @@ export const useTodoManagement = () => {
         if (currentAction.type === "create") {
           const { id: temporaryId, ...todoPayload } = currentAction.todo;
           const createdTodo = await createTodo(todoPayload);
+          const resolvedTodo = { ...currentAction.todo, ...createdTodo };
 
           syncedTodos = syncedTodos.map((todo) =>
-            todo.id === temporaryId ? { ...currentAction.todo, ...createdTodo } : todo
+            todo.id === temporaryId ? resolvedTodo : todo
+          );
+          nextPendingActions = remapPendingActionTodoId(
+            remainingActions,
+            temporaryId,
+            resolvedTodo
           );
         }
 
@@ -108,54 +125,127 @@ export const useTodoManagement = () => {
           const serverTodo = await fetchTodoById(currentAction.todoId);
 
           if (!serverTodo) {
-            const { id: previousId, ...todoPayload } = currentAction.todo;
-            const recreatedTodo = await createTodo(todoPayload);
-            const resolvedTodo = {
-              ...currentAction.todo,
-              ...recreatedTodo,
-            };
-
-            syncedTodos = syncedTodos.map((todo) =>
-              todo.id === previousId ? resolvedTodo : todo
-            );
-            nextPendingActions = remapPendingActionTodoId(
-              remainingActions,
-              previousId,
-              resolvedTodo
-            );
-            showInfoMessage(
-              "Задача была удалена на сервере. Локальная версия создана заново."
-            );
-          } else {
-            if (hasTodoConflict(serverTodo, currentAction.baseTodoSnapshot)) {
+            if (conflictStrategy === CONFLICT_STRATEGIES.SERVER_WINS) {
+              syncedTodos = syncedTodos.filter(
+                (todo) => todo.id !== currentAction.todoId
+              );
+              nextPendingActions = discardPendingActionsForTodoId(
+                remainingActions,
+                currentAction.todoId
+              );
               showInfoMessage(
-                "Обнаружен конфликт версии задачи. Применена локальная версия."
+                "Задача уже отсутствует на сервере. Принята серверная версия."
+              );
+            } else {
+              const { id: previousId, ...todoPayload } = currentAction.todo;
+              const recreatedTodo = await createTodo(todoPayload);
+              const resolvedTodo = {
+                ...currentAction.todo,
+                ...recreatedTodo,
+              };
+
+              syncedTodos = syncedTodos.map((todo) =>
+                todo.id === previousId ? resolvedTodo : todo
+              );
+              nextPendingActions = remapPendingActionTodoId(
+                remainingActions,
+                previousId,
+                resolvedTodo
+              );
+              showInfoMessage(
+                "Задача была удалена на сервере. Локальная версия создана заново."
+              );
+            }
+          } else {
+            const hasConflict = hasTodoConflict(
+              serverTodo,
+              currentAction.baseTodoSnapshot
+            );
+
+            if (
+              hasConflict &&
+              conflictStrategy === CONFLICT_STRATEGIES.SERVER_WINS
+            ) {
+              syncedTodos = syncedTodos.map((todo) =>
+                todo.id === currentAction.todoId ? serverTodo : todo
+              );
+              showInfoMessage(
+                "Обнаружен конфликт версии задачи. Принята серверная версия."
+              );
+            } else {
+              if (hasConflict) {
+                showInfoMessage(
+                  "Обнаружен конфликт версии задачи. Применена локальная версия."
+                );
+              }
+
+              await updateTodo(currentAction.todoId, currentAction.todo);
+              syncedTodos = syncedTodos.map((todo) =>
+                todo.id === currentAction.todoId ? currentAction.todo : todo
               );
             }
 
-            await updateTodo(currentAction.todoId, currentAction.todo);
-            syncedTodos = syncedTodos.map((todo) =>
-              todo.id === currentAction.todoId ? currentAction.todo : todo
-            );
+            if (
+              hasConflict &&
+              conflictStrategy === CONFLICT_STRATEGIES.SERVER_WINS
+            ) {
+              nextPendingActions = remainingActions;
+            } else if (hasConflict) {
+              showInfoMessage(
+                "Синхронизация конфликта завершена по стратегии локальной версии."
+              );
+            }
           }
         }
 
         if (currentAction.type === "delete") {
           const serverTodo = await fetchTodoById(currentAction.todoId);
+          let shouldKeepServerTodo = false;
 
           if (serverTodo) {
-            if (hasTodoConflict(serverTodo, currentAction.baseTodoSnapshot)) {
+            const hasConflict = hasTodoConflict(
+              serverTodo,
+              currentAction.baseTodoSnapshot
+            );
+
+            if (
+              hasConflict &&
+              conflictStrategy === CONFLICT_STRATEGIES.SERVER_WINS
+            ) {
+              syncedTodos = syncedTodos.map((todo) =>
+                todo.id === currentAction.todoId ? serverTodo : todo
+              );
+              shouldKeepServerTodo = true;
               showInfoMessage(
-                "Обнаружен конфликт перед удалением. Выбрано локальное удаление."
+                "Удаление отменено: при конфликте принята серверная версия."
+              );
+            } else {
+              if (hasConflict) {
+                showInfoMessage(
+                  "Обнаружен конфликт перед удалением. Выбрано локальное удаление."
+                );
+              }
+
+              await deleteTodo(currentAction.todoId);
+              syncedTodos = syncedTodos.filter(
+                (todo) => todo.id !== currentAction.todoId
               );
             }
-
-            await deleteTodo(currentAction.todoId);
+          } else {
+            if (conflictStrategy === CONFLICT_STRATEGIES.SERVER_WINS) {
+              showInfoMessage(
+                "Задача уже отсутствует на сервере. Удаление завершено серверной версией."
+              );
+            } else {
+              showInfoMessage(
+                "Задача уже отсутствует на сервере. Локальное удаление подтверждено."
+              );
+            }
           }
-
-          syncedTodos = syncedTodos.filter(
-            (todo) => todo.id !== currentAction.todoId
-          );
+          syncedTodos =
+            shouldKeepServerTodo
+              ? syncedTodos
+              : syncedTodos.filter((todo) => todo.id !== currentAction.todoId);
         }
 
         if (!isCancelled) {
@@ -189,6 +279,7 @@ export const useTodoManagement = () => {
   }, [
     isOnline,
     pendingActions,
+    conflictStrategy,
     showInfoMessage,
     showRequestError,
     showSuccessMessage,
@@ -222,6 +313,8 @@ export const useTodoManagement = () => {
     setIsDeletingCompleted,
     pendingActions,
     isSyncingPending,
+    conflictStrategy,
+    setConflictStrategy,
     ...actions,
   };
 };

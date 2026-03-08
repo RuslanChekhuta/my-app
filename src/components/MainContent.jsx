@@ -4,6 +4,7 @@ import { AddTodo } from "./AddTodo";
 import TodoList from "./TodoList";
 import TodoFilter from "./TodoFilter";
 import PendingActionsBadge from "./PendingActionsBadge";
+import PendingActionsPanel from "./PendingActionsPanel";
 
 const MainContent = ({
   onAdd,
@@ -14,6 +15,9 @@ const MainContent = ({
   onReorder,
   pendingActionsCount,
   isSyncingPending,
+  pendingActions,
+  conflictStrategy,
+  setConflictStrategy,
 }) => {
   const [filter, setFilter] = useState("all");
 
@@ -28,6 +32,12 @@ const MainContent = ({
       <PendingActionsBadge
         pendingActionsCount={pendingActionsCount}
         isSyncingPending={isSyncingPending}
+      />
+      <PendingActionsPanel
+        pendingActions={pendingActions}
+        isSyncingPending={isSyncingPending}
+        conflictStrategy={conflictStrategy}
+        setConflictStrategy={setConflictStrategy}
       />
       <AddTodo onAdd={onAdd} />
       <TodoFilter filter={filter} setFilter={setFilter} />

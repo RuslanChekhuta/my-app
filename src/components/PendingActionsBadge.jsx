@@ -21,7 +21,7 @@ const PendingActionsBadge = ({ pendingActionsCount, isSyncingPending }) => {
       <span>
         {isSyncingPending
           ? `Синхронизация: ${getPendingLabel(pendingActionsCount)}`
-          : `Ожидает sync: ${getPendingLabel(pendingActionsCount)}`}
+          : `Ожидает синхронизации: ${getPendingLabel(pendingActionsCount)}`}
       </span>
     </div>
   );

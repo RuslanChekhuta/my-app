@@ -29,6 +29,8 @@ function App() {
     onReorder,
     pendingActions,
     isSyncingPending,
+    conflictStrategy,
+    setConflictStrategy,
   } = useTodoManagement();
 
   return (
@@ -48,6 +50,9 @@ function App() {
           onReorder={onReorder}
           pendingActionsCount={pendingActions.length}
           isSyncingPending={isSyncingPending}
+          pendingActions={pendingActions}
+          conflictStrategy={conflictStrategy}
+          setConflictStrategy={setConflictStrategy}
         />
       </Suspense>
 

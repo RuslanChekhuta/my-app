@@ -133,3 +133,7 @@ export const remapPendingActionTodoId = (pendingActions, previousId, nextTodo) =
     };
   });
 };
+
+export const discardPendingActionsForTodoId = (pendingActions, todoId) => {
+  return pendingActions.filter((action) => action.todoId !== todoId);
+};
