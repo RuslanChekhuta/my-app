@@ -32,8 +32,8 @@
 ### Отслеживание сети
 
 Появились:
-- [NetWorkProvider.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/providers/NetWorkProvider.jsx)
-- [NetWorkContext.js](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/context/NetWorkContext.js)
+- [NetworkProvider.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/providers/NetworkProvider.jsx)
+- [NetworkContext.js](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/context/NetworkContext.js)
 - [Notification.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/Notification.jsx)
 
 Теперь приложение умеет:
@@ -45,7 +45,7 @@
 
 ## 3) Как теперь работает сетевой слой
 
-В [NetWorkProvider.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/providers/NetWorkProvider.jsx):
+В [NetworkProvider.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/providers/NetworkProvider.jsx):
 - начальное состояние берётся из `navigator.onLine`;
 - подписка идёт на события `online` и `offline`;
 - при изменении статуса обновляется объект `netWorkStatus`;
@@ -102,10 +102,10 @@
 
 ## 7) Технические замечания по текущему коду
 
-- В [ToggleTheme.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ToggleTheme.jsx) `NetWorkProvider` оборачивает только `Notification`, а не всё приложение.
+- В [ToggleTheme.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/ToggleTheme.jsx) `NetworkProvider` оборачивает только `Notification`, а не всё приложение.
   Это работает для текущего случая, но если сетевой статус понадобится в других местах, provider лучше поднимать в [main.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/main.jsx) или [App.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/App.jsx).
 
-- В [NetWorkProvider.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/providers/NetWorkProvider.jsx) в initial state есть `howNotification`, а дальше используется `showNotification`.
+- В [NetworkProvider.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/providers/NetworkProvider.jsx) в initial state есть `howNotification`, а дальше используется `showNotification`.
   Это явная опечатка в структуре состояния.
 
 - В [AddTodo.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/AddTodo.jsx) всё ещё остаются замечания из части 9:
@@ -144,7 +144,7 @@
 - [x] Добавлены иконки через `react-icons`.
 - [x] Улучшена адаптивность формы.
 - [x] Проект доведён до финальной комплексной версии.
-- [x] Поднять `NetWorkProvider` выше по дереву.
+- [x] Поднять `NetworkProvider` выше по дереву.
 - [x] Связать сетевой статус с реальными API-действиями.
 - [x] Дочистить speech-логику и мелкие опечатки.
 

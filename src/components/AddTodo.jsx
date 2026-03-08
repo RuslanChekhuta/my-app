@@ -8,27 +8,42 @@ export function AddTodo({ onAdd }) {
   const [text, setText] = useState("");
   const [deadline, setDeadline] = useState("");
   const [showDeadlineInput, setShowDeadlineInput] = useState(false);
-  const { isSupported, isListening, speechError, resetTranscript, toggleListening } =
-    useSpeechRecognition({
-      onTranscriptChange: setText,
-    });
+  const [inputError, setInputError] = useState("");
+  const {
+    isSupported,
+    isListening,
+    speechError,
+    resetTranscript,
+    toggleListening,
+  } = useSpeechRecognition({
+    onTranscriptChange: (nextText) => {
+      setText(nextText);
+      if (nextText.trim()) {
+        setInputError("");
+      }
+    },
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (text.trim()) {
-      const isAdded = await onAdd(text.trim(), deadline);
+    const trimmedText = text.trim();
 
-      if (!isAdded) {
-        return;
-      }
-
-      setText("");
-      setDeadline("");
-      setShowDeadlineInput(false);
-      resetTranscript();
-    } else {
-      alert("Введите текст задачи");
+    if (!trimmedText) {
+      setInputError("Введите текст задачи.");
+      return;
     }
+
+    const isAdded = await onAdd(trimmedText, deadline);
+
+    if (!isAdded) {
+      return;
+    }
+
+    setText("");
+    setDeadline("");
+    setShowDeadlineInput(false);
+    setInputError("");
+    resetTranscript();
   };
 
   return (
@@ -39,6 +54,9 @@ export function AddTodo({ onAdd }) {
           value={text}
           onChange={(e) => {
             setText(e.target.value);
+            if (e.target.value.trim()) {
+              setInputError("");
+            }
           }}
           placeholder="Добавить задачу..."
           className="flex-1 p-3 text-gray-700 outline-none placeholder-gray-400 dark:text-gray-200"
@@ -90,6 +108,11 @@ export function AddTodo({ onAdd }) {
         setDeadline={setDeadline}
         setShowDeadlineInput={setShowDeadlineInput}
       />
+      {inputError && (
+        <div className="mt-2 text-sm text-red-600 dark:text-red-400">
+          {inputError}
+        </div>
+      )}
       {!isSupported && (
         <div className="mt-2 text-sm text-amber-600 dark:text-amber-400">
           Голосовой ввод не поддерживается в этом браузере.

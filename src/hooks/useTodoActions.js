@@ -1,3 +1,10 @@
+import {
+  queueCreateTodoAction,
+  queueDeleteTodoAction,
+  queueMultipleUpdateActions,
+  queueUpdateTodoAction,
+} from "../helpers/offlineTodoQueue.js";
+
 export const useTodoActions = ({
   todos,
   setTodos,
@@ -11,28 +18,46 @@ export const useTodoActions = ({
   deleteTodo,
   setIsDeletingCompleted,
   isOnline,
-  showOfflineMessage,
+  pendingActions,
+  setPendingActions,
+  showInfoMessage,
   showRequestError,
 }) => {
-  const ensureOnline = (message) => {
-    if (isOnline) {
-      return true;
+  const shouldQueueLocally = !isOnline || pendingActions.length > 0;
+
+  const getQueuedMessage = (actionLabel) => {
+    if (!isOnline) {
+      return `${actionLabel} сохранено локально и будет синхронизировано после восстановления сети.`;
     }
 
-    showOfflineMessage(message);
-    return false;
+    return `${actionLabel} добавлено в очередь синхронизации.`;
+  };
+
+  const persistQueuedChange = ({
+    updatedTodos,
+    nextPendingActions,
+    message,
+  }) => {
+    setTodos(updatedTodos);
+    saveToLocalStorage(updatedTodos);
+    setPendingActions(nextPendingActions);
+    showInfoMessage(message);
   };
 
   const onAdd = async (text, deadline) => {
-    if (
-      !ensureOnline("Нет подключения к интернету. Добавление задачи недоступно.")
-    ) {
-      return false;
+    const newTodo = createNewTodo(text, deadline, getNextTodoOrder(todos));
+    const previousTodos = todos;
+    const updatedTodos = [...previousTodos, newTodo];
+
+    if (shouldQueueLocally) {
+      persistQueuedChange({
+        updatedTodos,
+        nextPendingActions: queueCreateTodoAction(pendingActions, newTodo),
+        message: getQueuedMessage("Новая задача"),
+      });
+      return true;
     }
 
-    const previousTodos = todos;
-    const newTodo = createNewTodo(text, deadline, getNextTodoOrder(todos));
-    const updatedTodos = [...previousTodos, newTodo];
     setTodos(updatedTodos);
 
     try {
@@ -52,14 +77,6 @@ export const useTodoActions = ({
   };
 
   const handleUpdate = async (id, newText, newDeadline) => {
-    if (
-      !ensureOnline(
-        "Нет подключения к интернету. Редактирование задачи недоступно."
-      )
-    ) {
-      return;
-    }
-
     const todoToUpdate = todos.find((todo) => todo.id === id);
 
     if (!todoToUpdate) return;
@@ -69,6 +86,15 @@ export const useTodoActions = ({
     const updatedTodos = todos.map((todo) =>
       todo.id === id ? updatedTodo : todo
     );
+
+    if (shouldQueueLocally) {
+      persistQueuedChange({
+        updatedTodos,
+        nextPendingActions: queueUpdateTodoAction(pendingActions, updatedTodo),
+        message: getQueuedMessage("Изменение задачи"),
+      });
+      return;
+    }
 
     setTodos(updatedTodos);
 
@@ -83,14 +109,6 @@ export const useTodoActions = ({
   };
 
   const toggleComplete = async (id) => {
-    if (
-      !ensureOnline(
-        "Нет подключения к интернету. Изменение статуса задачи недоступно."
-      )
-    ) {
-      return;
-    }
-
     const todoToUpdate = todos.find((todo) => todo.id === id);
 
     if (!todoToUpdate) return;
@@ -100,6 +118,15 @@ export const useTodoActions = ({
     const updatedTodos = todos.map((todo) =>
       todo.id === id ? updatedTodo : todo
     );
+
+    if (shouldQueueLocally) {
+      persistQueuedChange({
+        updatedTodos,
+        nextPendingActions: queueUpdateTodoAction(pendingActions, updatedTodo),
+        message: getQueuedMessage("Статус задачи"),
+      });
+      return;
+    }
 
     setTodos(updatedTodos);
 
@@ -114,14 +141,18 @@ export const useTodoActions = ({
   };
 
   const handleDelete = async (id) => {
-    if (
-      !ensureOnline("Нет подключения к интернету. Удаление задачи недоступно.")
-    ) {
+    const previousTodos = todos;
+    const updatedTodos = todos.filter((todo) => todo.id !== id);
+
+    if (shouldQueueLocally) {
+      persistQueuedChange({
+        updatedTodos,
+        nextPendingActions: queueDeleteTodoAction(pendingActions, id),
+        message: getQueuedMessage("Удаление задачи"),
+      });
       return;
     }
 
-    const previousTodos = todos;
-    const updatedTodos = todos.filter((todo) => todo.id !== id);
     setTodos(updatedTodos);
 
     try {
@@ -137,28 +168,11 @@ export const useTodoActions = ({
   const hasCompletedTodos = todos.some((todo) => todo.completed);
 
   const handleDeleteCompleted = () => {
-    if (
-      !ensureOnline(
-        "Нет подключения к интернету. Удаление выполненных задач недоступно."
-      )
-    ) {
-      return;
-    }
-
     if (!todos.some((todo) => todo.completed)) return;
     setIsDeletingCompleted(true);
   };
 
   const confirmDeleteCompleted = async () => {
-    if (
-      !ensureOnline(
-        "Нет подключения к интернету. Удаление выполненных задач недоступно."
-      )
-    ) {
-      setIsDeletingCompleted(false);
-      return;
-    }
-
     const originalTodos = [...todos];
 
     const completedIds = originalTodos
@@ -166,6 +180,21 @@ export const useTodoActions = ({
       .map((t) => t.id);
 
     const updatedTodos = originalTodos.filter((todo) => !todo.completed);
+
+    if (shouldQueueLocally) {
+      const nextPendingActions = completedIds.reduce((queue, id) => {
+        return queueDeleteTodoAction(queue, id);
+      }, pendingActions);
+
+      persistQueuedChange({
+        updatedTodos,
+        nextPendingActions,
+        message: getQueuedMessage("Удаление выполненных задач"),
+      });
+      setIsDeletingCompleted(false);
+      return;
+    }
+
     setTodos(updatedTodos);
 
     const results = await Promise.allSettled(
@@ -199,14 +228,6 @@ export const useTodoActions = ({
   const onReorder = async (activeId, overId) => {
     if (!overId) return;
 
-    if (
-      !ensureOnline(
-        "Нет подключения к интернету. Смена порядка задач недоступна."
-      )
-    ) {
-      return;
-    }
-
     const previousTodos = todos;
 
     try {
@@ -225,10 +246,22 @@ export const useTodoActions = ({
         order: index + 1,
       }));
 
+      if (shouldQueueLocally) {
+        persistQueuedChange({
+          updatedTodos,
+          nextPendingActions: queueMultipleUpdateActions(
+            pendingActions,
+            updatedTodos
+          ),
+          message: getQueuedMessage("Новый порядок задач"),
+        });
+        return;
+      }
+
       setTodos(updatedTodos);
 
       await Promise.all(
-        updatedTodos.map((todo) => updateTodo(todo.id, { order: todo.order }))
+        updatedTodos.map((todo) => updateTodo(todo.id, todo))
       );
       saveToLocalStorage(updatedTodos);
     } catch (error) {

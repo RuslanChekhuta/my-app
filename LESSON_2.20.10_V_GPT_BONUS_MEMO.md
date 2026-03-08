@@ -36,18 +36,18 @@
 Теперь сеть не просто показывается в UI, а влияет на поведение приложения.
 
 Для этого используются:
-- [NetWorkProvider.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/providers/NetWorkProvider.jsx)
+- [NetworkProvider.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/providers/NetworkProvider.jsx)
 - [useNetworkStatus.js](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/hooks/useNetworkStatus.js)
 - [Notification.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/Notification.jsx)
 
 Что это даёт:
 - если интернета нет, приложение знает об этом заранее;
 - пользователь получает понятные уведомления;
-- операции с сервером можно блокировать до запроса, а не только после ошибки.
+- офлайн-изменения можно сохранить локально и синхронизировать после восстановления сети.
 
-### Todo-операции стали учитывать offline-сценарий
+### Todo-операции стали offline-friendly
 
-В [useTodoActions.js](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/hooks/useTodoActions.js) появился `ensureOnline`.
+В [useTodoActions.js](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/hooks/useTodoActions.js) и [offlineTodoQueue.js](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/helpers/offlineTodoQueue.js) появилась локальная очередь действий.
 
 Теперь:
 - добавление;
@@ -56,9 +56,9 @@
 - удаление выполненных;
 - reorder
 
-проверяют сеть до обращения к API.
+могут выполняться локально без потери пользовательского состояния.
 
-Это важное отличие от предыдущей версии, где приложение пыталось отправить запрос и только потом падало в `catch`.
+Это важное отличие от предыдущей версии: теперь offline не просто "блокирует действие", а даёт приложению продолжать работать с последующей синхронизацией.
 
 ## 3) Что стало лучше в AddTodo
 
@@ -79,7 +79,7 @@
 
 ### Provider поднят в корень приложения
 
-В [main.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/main.jsx) `NetWorkProvider` теперь оборачивает весь `App`.
+В [main.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/main.jsx) `NetworkProvider` теперь оборачивает весь `App`.
 
 Это правильнее, чем держать provider внутри одного компонента вроде `ToggleTheme`, потому что:
 - сетевой статус становится глобальным состоянием;
@@ -103,7 +103,7 @@
 - если сеть есть, список синхронизируется с сервером;
 - ошибки загрузки теперь сопровождаются уведомлением пользователю.
 
-Это уже нормальная offline-friendly логика, пусть и в упрощённом виде.
+Это уже не только offline-friendly, но и частично offline-first логика: локальные изменения не теряются и догоняют сервер позже.
 
 ## 5) Что важно понять из бонусной части
 
@@ -127,10 +127,9 @@
 
 ## 7) Что ещё можно улучшить после бонусной части
 
-- Переименовать `NetWorkProvider` и `NetWorkContext` в более стандартные `NetworkProvider` и `NetworkContext`.
-- Убрать оставшиеся дубли между `api`, `helpers` и `hooks`, если они ещё не используются.
-- Заменить `alert("Введите текст задачи")` в [AddTodo.jsx](D:/Ruslan/Projects/Web-garage/tasks/my-app/src/components/AddTodo.jsx) на inline-валидацию.
-- Добавить очередь офлайн-действий, если хочется следующего уровня сложности.
+- Добавить стратегию conflict resolution, если один и тот же todo менялся локально и на сервере параллельно.
+- Добавить backoff/retry-политику для синхронизации очереди.
+- Покрыть offline-очередь и sync-flow тестами.
 - Подумать о вынесении уведомлений в более общий `toast`-слой.
 
 ## 8) Что запомнить как итог всего проекта
@@ -152,12 +151,12 @@
 - [x] Голосовой ввод вынесен в `useSpeechRecognition`.
 - [x] Добавлена проверка поддержки браузера.
 - [x] Ошибки voice input стали понятнее пользователю.
-- [x] `NetWorkProvider` поднят в корень приложения.
+- [x] `NetworkProvider` поднят в корень приложения.
 - [x] Сетевой статус подключён к todo-операциям.
 - [x] Добавление задачи теперь сообщает UI об успехе или провале.
 - [x] `ToggleTheme` снова стал чистым компонентом интерфейса.
-- [ ] Можно ещё улучшить офлайн-стратегию.
-- [ ] Можно ещё дочистить нейминг и остаточные дубли.
+- [x] Улучшена офлайн-стратегия через локальную очередь и отложенную синхронизацию.
+- [x] Дочищен нейминг и убраны остаточные дубли.
 
 ---
 

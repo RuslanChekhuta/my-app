@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { NetWorkContext } from "../context/NetWorkContext";
+import { NetworkContext } from "../context/NetworkContext";
 
 const getInitialNetworkStatus = () => {
   const isOnline = typeof navigator === "undefined" ? true : navigator.onLine;
@@ -14,7 +14,7 @@ const getInitialNetworkStatus = () => {
   };
 };
 
-const NetWorkProvider = ({ children }) => {
+const NetworkProvider = ({ children }) => {
   const [networkStatus, setNetworkStatus] = useState(getInitialNetworkStatus);
   const hideTimeoutRef = useRef(null);
 
@@ -80,6 +80,28 @@ const NetWorkProvider = ({ children }) => {
     [showNotification]
   );
 
+  const showInfoMessage = useCallback(
+    (message) => {
+      showNotification({
+        message,
+        variant: "info",
+        autoHide: true,
+      });
+    },
+    [showNotification]
+  );
+
+  const showSuccessMessage = useCallback(
+    (message) => {
+      showNotification({
+        message,
+        variant: "success",
+        autoHide: true,
+      });
+    },
+    [showNotification]
+  );
+
   useEffect(() => {
     const handleOnline = () => {
       showNotification({
@@ -105,17 +127,19 @@ const NetWorkProvider = ({ children }) => {
   }, [clearHideTimeout, showNotification, showOfflineMessage]);
 
   return (
-    <NetWorkContext.Provider
+    <NetworkContext.Provider
       value={{
         networkStatus,
         isOnline: networkStatus.isOnline,
         showOfflineMessage,
         showRequestError,
+        showInfoMessage,
+        showSuccessMessage,
       }}
     >
       {children}
-    </NetWorkContext.Provider>
+    </NetworkContext.Provider>
   );
 };
 
-export default NetWorkProvider;
+export default NetworkProvider;

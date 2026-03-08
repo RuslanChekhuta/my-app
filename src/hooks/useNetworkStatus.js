@@ -1,12 +1,12 @@
 import { useContext } from "react";
-import { NetWorkContext } from "../context/NetWorkContext";
+import { NetworkContext } from "../context/NetworkContext";
 
 export const useNetworkStatus = () => {
-  const context = useContext(NetWorkContext);
+  const context = useContext(NetworkContext);
 
   if (!context) {
     throw new Error(
-      "useNetworkStatus должен использоваться внутри NetWorkProvider"
+      "useNetworkStatus должен использоваться внутри NetworkProvider"
     );
   }
 
