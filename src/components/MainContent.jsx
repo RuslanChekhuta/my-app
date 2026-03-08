@@ -20,7 +20,7 @@ const MainContent = ({
     return true;
   });
   return (
-    <div className="mx-auto flex flex-col gap-3">
+    <div className="flex flex-col gap-3 mx-auto">
       <Header />
       <AddTodo onAdd={onAdd} />
       <TodoFilter filter={filter} setFilter={setFilter} />

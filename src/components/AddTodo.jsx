@@ -1,11 +1,109 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DeadlineBlock from "./DeadlineBlock";
 import PlusIcon from "./PlusIcon";
+import MicrophoneIcon from "../assets/microphone.png";
 
 export function AddTodo({ onAdd }) {
   const [text, setText] = useState("");
   const [deadline, setDeadline] = useState("");
   const [showDeadlineInput, setShowDeadlineInput] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [recognition, setRecognition] = useState(null);
+  const finalTextRef = useRef("");
+  // const inputRef = useRef(null); // Добавляем ref для input
+
+  // // Функция для перемещения курсора в конец input
+  // const moveCursorToEnd = () => {
+  //   if (inputRef.current) {
+  //     inputRef.current.focus();
+  //     const length = inputRef.current.value.length;
+  //     inputRef.current.setSelectionRange(length, length);
+
+  //     // Прокручиваем input до конца, если текст не помещается
+  //     inputRef.current.scrollLeft = inputRef.current.scrollWidth;
+  //   }
+  // };
+
+  const startListening = () => {
+    if (recognition) {
+      recognition.start();
+      setIsListening(true);
+    }
+  };
+
+  const stopListening = () => {
+    if (recognition) {
+      recognition.stop();
+      setIsListening(false);
+      setText(finalTextRef.current);
+      // moveCursorToEnd(); // Перемещаем курсор в конец при остановке записи
+    }
+  };
+
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognitionInstance = new SpeechRecognition();
+        recognitionInstance.continuous = true;
+        recognitionInstance.lang = "ru-RU";
+        recognitionInstance.interimResults = true;
+
+        recognitionInstance.onresult = (event) => {
+          let finalTranscript = "";
+          let interimScript = "";
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              finalTranscript += transcript;
+            } else {
+              interimScript += transcript;
+            }
+            console.log("Финал", finalTranscript);
+            console.log("Промежуточный", interimScript);
+
+            if (finalTranscript) {
+              finalTextRef.current =
+                finalTextRef.current + " " + finalTranscript;
+              setText(finalTextRef.current);
+            } else if (interimScript) {
+              setText(finalTextRef.current + " " + interimScript);
+            }
+          }
+          // moveCursorToEnd(); // Перемещаем курсор в конец при каждом обновлении текста
+        };
+
+        recognitionInstance.onerror = (event) => {
+          console.error("Ошибка распознавания:", event.error);
+          stopListening();
+        };
+
+        recognitionInstance.onend = () => {
+          if (isListening) {
+            recognitionInstance.start();
+          }
+        };
+
+        setRecognition(recognitionInstance);
+      }
+    }
+
+    return () => {
+      if (recognition) {
+        recognition.stop();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isListening]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,22 +112,49 @@ export function AddTodo({ onAdd }) {
       setText("");
       setDeadline("");
       setShowDeadlineInput("");
+      finalTextRef.current = "";
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="mb-6">
-      <div className="flex items-center bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 focus-within:ring-2 focus-within:ring-blue-500">
+      <div className="flex items-center bg-white dark:bg-page-dark shadow-sm border border-gray-100 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 overflow-hidden">
         <input
           type="text"
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => {
+            setText(e.target.value);
+          }}
+          // ref={inputRef} // Добавляем ref к input
           placeholder="Добавить задачу..."
-          className="flex-1 p-3 text-gray-700 dark:bg-page-dark dark:text-txt-dark outline-none placeholder-gray-400"
+          className="flex-1 dark:bg-page-dark p-3 outline-none text-gray-200 dark:text-txt-dark placeholder-gray-400"
         />
         <button
+          type="button"
+          onClick={toggleListening}
+          className={`cursor-pointer p-1 rounded-full ${
+            isListening
+              ? "bg-red-500 hover:bg-red-700"
+              : "bg-gray-200 hover:bg-gray-300"
+          }  transition-colors duration-300 flex items-center justify-center`}
+          title={isListening ? "Остановить запись" : "Начать запись голоса"}
+        >
+          <img
+            src={MicrophoneIcon}
+            alt="Микрофон"
+            className={`w-8 h-8 ${
+              isListening ? "filter brightness-0 invert" : ""
+            }`}
+          />
+        </button>
+        <button
           type="submit"
-          className="p-3 bg-btn-light hover:bg-btn-light-hv text-white dark:bg-btn-dark hover:dark:bg-btn-dark-hv transition-colors duration-300 cursor-pointer"
+          className={`p-3 ${
+            isListening
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-btn-light hover:bg-btn-light-hv cursor-pointer"
+          }  text-white dark:bg-btn-dark hover:dark:bg-btn-dark-hv transition-colors duration-300 `}
+          disabled={isListening}
         >
           <PlusIcon />
         </button>
@@ -40,6 +165,12 @@ export function AddTodo({ onAdd }) {
         setDeadline={setDeadline}
         setShowDeadlineInput={setShowDeadlineInput}
       />
+      {isListening && (
+        <div className="flex items-center mt-2 text-blue-500 text-sm">
+          <div className="bg-red-500 mr-2 rounded-full w-3 h-3 animate-pulse"></div>
+          <span>Идет запись... Нажмите микрофон для остановки</span>
+        </div>
+      )}
     </form>
   );
 }
