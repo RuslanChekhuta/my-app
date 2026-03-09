@@ -20,7 +20,7 @@ const StatusMessage = ({
   return (
     <div
       className={cn(
-        "flex items-start gap-3 rounded-[1.35rem] border px-4 py-3 text-sm leading-6 shadow-[0_25px_55px_rgba(17,35,46,0.08)] backdrop-blur-xl",
+        "flex max-w-full items-start gap-3 rounded-[1.35rem] border px-4 py-3 text-sm leading-6 break-words shadow-[0_25px_55px_rgba(17,35,46,0.08)] backdrop-blur-xl",
         TONE_CLASSES[tone] ?? TONE_CLASSES.info,
         className
       )}

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocalization } from "./useLocalization";
 
 const getSpeechRecognitionConstructor = () => {
   if (typeof window === "undefined") {
@@ -8,6 +9,26 @@ const getSpeechRecognitionConstructor = () => {
   return window.SpeechRecognition || window.webkitSpeechRecognition || null;
 };
 
+const getSpeechEnvironment = () => {
+  if (typeof window === "undefined") {
+    return {
+      isSecureContext: true,
+      isLikelyMobile: false,
+      recognitionConstructor: null,
+    };
+  }
+
+  const isLikelyMobile =
+    Boolean(window.matchMedia?.("(pointer: coarse)")?.matches) ||
+    /Android|webOS|iPhone|iPad|iPod/i.test(window.navigator.userAgent);
+
+  return {
+    isSecureContext: window.isSecureContext,
+    isLikelyMobile,
+    recognitionConstructor: getSpeechRecognitionConstructor(),
+  };
+};
+
 const joinTranscriptParts = (...parts) => {
   return parts
     .map((part) => part.trim())
@@ -15,25 +36,26 @@ const joinTranscriptParts = (...parts) => {
     .join(" ");
 };
 
-const getSpeechErrorMessage = (errorCode) => {
+const getSpeechErrorMessage = (errorCode, t) => {
   switch (errorCode) {
     case "not-allowed":
     case "service-not-allowed":
-      return "Доступ к микрофону запрещён. Проверьте разрешения браузера.";
+      return t("speech.permissionDenied");
     case "network":
-      return "Ошибка сети во время распознавания речи.";
+      return t("speech.network");
+    case "audio-capture":
+      return t("speech.audioCapture");
     case "no-speech":
-      return "Речь не распознана. Попробуйте сказать задачу ещё раз.";
+      return t("speech.noSpeech");
     default:
-      return "Не удалось распознать речь. Попробуйте ещё раз.";
+      return t("speech.generic");
   }
 };
 
-export const useSpeechRecognition = ({
-  lang = "ru-RU",
-  onTranscriptChange,
-}) => {
+export const useSpeechRecognition = ({ onTranscriptChange }) => {
+  const { speechLocale, t } = useLocalization();
   const recognitionRef = useRef(null);
+  const speechEnvironmentRef = useRef(getSpeechEnvironment());
   const shouldRestartRef = useRef(false);
   const transcriptSeedRef = useRef("");
   const recognizedTextRef = useRef("");
@@ -47,18 +69,34 @@ export const useSpeechRecognition = ({
   }, [onTranscriptChange]);
 
   useEffect(() => {
-    const SpeechRecognition = getSpeechRecognitionConstructor();
+    const speechEnvironment = getSpeechEnvironment();
+    speechEnvironmentRef.current = speechEnvironment;
+
+    const { recognitionConstructor: SpeechRecognition, isLikelyMobile } =
+      speechEnvironment;
 
     if (!SpeechRecognition) {
       setIsSupported(false);
-      setSpeechError("Голосовой ввод не поддерживается в этом браузере.");
+      setSpeechError(
+        speechEnvironment.isSecureContext
+          ? t("speech.unsupported")
+          : t("speech.requiresSecure")
+      );
       return undefined;
     }
 
+    setIsSupported(true);
+    setSpeechError("");
+
     const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.lang = lang;
-    recognition.interimResults = true;
+    recognition.continuous = !isLikelyMobile;
+    recognition.lang = speechLocale;
+    recognition.interimResults = !isLikelyMobile;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
 
     recognition.onresult = (event) => {
       let finalSegment = "";
@@ -101,18 +139,18 @@ export const useSpeechRecognition = ({
 
       shouldRestartRef.current = false;
       setIsListening(false);
-      setSpeechError(getSpeechErrorMessage(event.error));
+      setSpeechError(getSpeechErrorMessage(event.error, t));
     };
 
     recognition.onend = () => {
-      if (shouldRestartRef.current) {
+      if (shouldRestartRef.current && !isLikelyMobile) {
         try {
           recognition.start();
           return;
         } catch {
           shouldRestartRef.current = false;
           setIsListening(false);
-          setSpeechError("Не удалось перезапустить запись. Попробуйте ещё раз.");
+          setSpeechError(t("speech.restartFailed"));
         }
       }
 
@@ -129,6 +167,7 @@ export const useSpeechRecognition = ({
 
     return () => {
       shouldRestartRef.current = false;
+      recognition.onstart = null;
       recognition.onresult = null;
       recognition.onerror = null;
       recognition.onend = null;
@@ -141,11 +180,26 @@ export const useSpeechRecognition = ({
 
       recognitionRef.current = null;
     };
-  }, [lang]);
+  }, [speechLocale, t]);
 
   const startListening = (currentText = "") => {
+    const speechEnvironment = speechEnvironmentRef.current;
+
     if (!recognitionRef.current) {
-      setSpeechError("Голосовой ввод не поддерживается в этом браузере.");
+      setSpeechError(
+        speechEnvironment.isSecureContext
+          ? t("speech.unsupported")
+          : t("speech.requiresSecure")
+      );
+      return;
+    }
+
+    if (!speechEnvironment.isSecureContext) {
+      setSpeechError(
+        speechEnvironment.isLikelyMobile
+          ? t("speech.requiresSecureMobile")
+          : t("speech.requiresSecure")
+      );
       return;
     }
 
@@ -156,11 +210,14 @@ export const useSpeechRecognition = ({
 
     try {
       recognitionRef.current.start();
-      setIsListening(true);
     } catch {
       shouldRestartRef.current = false;
       setIsListening(false);
-      setSpeechError("Не удалось запустить запись. Попробуйте ещё раз.");
+      setSpeechError(
+        speechEnvironment.isLikelyMobile
+          ? t("speech.startFailedMobile")
+          : t("speech.startFailed")
+      );
     }
   };
 

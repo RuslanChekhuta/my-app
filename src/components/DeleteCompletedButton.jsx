@@ -1,6 +1,9 @@
 import Button from "./ui/Button";
+import { useLocalization } from "../hooks/useLocalization";
 
 const DeleteCompletedButton = ({ hasCompletedTodos, onClick }) => {
+  const { t } = useLocalization();
+
   if (!hasCompletedTodos) return null;
 
   return (
@@ -8,9 +11,9 @@ const DeleteCompletedButton = ({ hasCompletedTodos, onClick }) => {
       onClick={onClick}
       variant="dangerSoft"
       size="md"
-      className="motion-fade-up motion-delay-4 mt-5 self-center"
+      className="motion-fade-up motion-delay-4 mt-5 w-full self-center justify-center sm:w-auto"
     >
-      Очистить завершённые задачи
+      {t("deleteCompleted.clear")}
     </Button>
   );
 };

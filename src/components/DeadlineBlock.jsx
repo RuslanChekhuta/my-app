@@ -1,5 +1,6 @@
 import { RiCalendarScheduleLine, RiCloseLine } from "react-icons/ri";
 import formatDateTime from "../helpers/dateUtils";
+import { useLocalization } from "../hooks/useLocalization";
 import Button from "./ui/Button";
 import FieldControl from "./ui/FieldControl";
 
@@ -9,6 +10,8 @@ const DeadlineBlock = ({
   setDeadline,
   setShowDeadlineInput,
 }) => {
+  const { locale, t } = useLocalization();
+
   return (
     <div className="mt-4">
       {showDeadlineInput && (
@@ -20,10 +23,15 @@ const DeadlineBlock = ({
             className="flex-1 bg-white/85 dark:bg-slate-950/75"
           />
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
             {deadline && (
-              <Button onClick={() => setDeadline("")} variant="warmSoft" size="sm">
-                Очистить
+              <Button
+                onClick={() => setDeadline("")}
+                variant="warmSoft"
+                size="sm"
+                className="w-full sm:w-auto"
+              >
+                {t("deadline.clear")}
               </Button>
             )}
 
@@ -34,8 +42,9 @@ const DeadlineBlock = ({
               }}
               variant="secondary"
               size="sm"
+              className="w-full sm:w-auto"
             >
-              Скрыть
+              {t("deadline.hide")}
             </Button>
           </div>
         </div>
@@ -47,18 +56,22 @@ const DeadlineBlock = ({
           }}
           variant="secondary"
           size="sm"
-          className="bg-white/80 dark:bg-slate-900/70"
+          className="w-full justify-between gap-3 bg-white/80 text-left whitespace-normal dark:bg-slate-900/70 sm:w-auto sm:justify-center"
         >
           {deadline ? (
             <>
               <RiCalendarScheduleLine className="text-base" />
-              <span>Дедлайн: {formatDateTime(deadline)}</span>
+              <span className="min-w-0 flex-1 break-words">
+                {t("deadline.value", {
+                  date: formatDateTime(deadline, locale),
+                })}
+              </span>
               <RiCloseLine className="text-base opacity-60" />
             </>
           ) : (
             <>
               <RiCalendarScheduleLine className="text-base" />
-              <span>Добавить дедлайн</span>
+              <span>{t("deadline.add")}</span>
             </>
           )}
         </Button>

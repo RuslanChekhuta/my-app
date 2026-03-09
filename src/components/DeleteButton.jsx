@@ -1,13 +1,17 @@
 import Button from "./ui/Button";
+import { useLocalization } from "../hooks/useLocalization";
 
-const DeleteButton = ({ onClick }) => {
+const DeleteButton = ({ onClick, className = "" }) => {
+  const { t } = useLocalization();
+
   return (
     <Button
       onClick={onClick}
       variant="ghost"
       size="icon"
-      className="shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
-      aria-label="Удалить задачу"
+      className={`shrink-0 ${className}`.trim()}
+      aria-label={t("task.delete")}
+      title={t("task.delete")}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

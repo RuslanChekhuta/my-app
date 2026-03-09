@@ -19,7 +19,7 @@ const EyebrowChip = ({
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em]",
+        "inline-flex max-w-full items-center gap-2 rounded-full border px-3 py-1 text-left text-[11px] font-semibold uppercase tracking-[0.22em] whitespace-normal break-words",
         TONE_CLASSES[tone] ?? TONE_CLASSES.accent,
         className
       )}

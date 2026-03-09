@@ -1,6 +1,10 @@
 import Button from "./ui/Button";
+import { useLocalization } from "../hooks/useLocalization";
 
-const CheckboxButton = ({ completed, onClick }) => {
+const CheckboxButton = ({ completed, onClick, className = "" }) => {
+  const { t } = useLocalization();
+  const label = completed ? t("task.markActive") : t("task.markCompleted");
+
   return (
     <Button
       onClick={onClick}
@@ -10,10 +14,10 @@ const CheckboxButton = ({ completed, onClick }) => {
         completed
           ? "border-[rgba(21,119,128,0.32)] shadow-[0_14px_32px_rgba(21,119,128,0.22)]"
           : "bg-white/90 text-transparent dark:border-slate-700 dark:bg-slate-900/75"
-      }`}
-      aria-label={
-        completed ? "Отметить как невыполненную" : "Отметить как выполненную"
-      }
+      } ${className}`.trim()}
+      aria-label={label}
+      aria-pressed={completed}
+      title={label}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

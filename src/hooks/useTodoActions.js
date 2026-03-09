@@ -5,6 +5,7 @@ import {
   queueUpdateTodoAction,
 } from "../helpers/offlineTodoQueue.js";
 import { createTodoSyncSnapshot } from "../helpers/todoHelpers.js";
+import { useLocalization } from "./useLocalization";
 
 export const useTodoActions = ({
   todos,
@@ -24,14 +25,19 @@ export const useTodoActions = ({
   showInfoMessage,
   showRequestError,
 }) => {
+  const { t } = useLocalization();
   const shouldQueueLocally = !isOnline || pendingActions.length > 0;
 
   const getQueuedMessage = (actionLabel) => {
     if (!isOnline) {
-      return `${actionLabel} сохранено локально и будет синхронизировано после восстановления сети.`;
+      return t("todoAction.savedOffline", {
+        action: actionLabel,
+      });
     }
 
-    return `${actionLabel} добавлено в очередь синхронизации.`;
+    return t("todoAction.queued", {
+      action: actionLabel,
+    });
   };
 
   const persistQueuedChange = ({
@@ -48,13 +54,13 @@ export const useTodoActions = ({
   const onAdd = async (text, deadline) => {
     const newTodo = createNewTodo(text, deadline, getNextTodoOrder(todos));
     const previousTodos = todos;
-    const updatedTodos = [...previousTodos, newTodo];
+    const updatedTodos = [newTodo, ...previousTodos];
 
     if (shouldQueueLocally) {
       persistQueuedChange({
         updatedTodos,
         nextPendingActions: queueCreateTodoAction(pendingActions, newTodo),
-        message: getQueuedMessage("Новая задача"),
+        message: getQueuedMessage(t("todoAction.label.newTask")),
       });
       return true;
     }
@@ -71,7 +77,7 @@ export const useTodoActions = ({
       return true;
     } catch (error) {
       console.error("Ошибка добавления:", error);
-      showRequestError("Не удалось добавить задачу.");
+      showRequestError(t("todoAction.addFailed"));
       setTodos(previousTodos);
       return false;
     }
@@ -96,7 +102,7 @@ export const useTodoActions = ({
           updatedTodo,
           createTodoSyncSnapshot(todoToUpdate)
         ),
-        message: getQueuedMessage("Изменение задачи"),
+        message: getQueuedMessage(t("todoAction.label.taskChange")),
       });
       return;
     }
@@ -108,7 +114,7 @@ export const useTodoActions = ({
       saveToLocalStorage(updatedTodos);
     } catch (error) {
       console.error("Ошибка обновления:", error);
-      showRequestError("Не удалось сохранить изменения задачи.");
+      showRequestError(t("todoAction.updateFailed"));
       setTodos(todos);
     }
   };
@@ -132,7 +138,7 @@ export const useTodoActions = ({
           updatedTodo,
           createTodoSyncSnapshot(todoToUpdate)
         ),
-        message: getQueuedMessage("Статус задачи"),
+        message: getQueuedMessage(t("todoAction.label.taskStatus")),
       });
       return;
     }
@@ -144,7 +150,7 @@ export const useTodoActions = ({
       saveToLocalStorage(updatedTodos);
     } catch (error) {
       console.error("Ошибка обновления:", error);
-      showRequestError("Не удалось обновить статус задачи.");
+      showRequestError(t("todoAction.toggleFailed"));
       setTodos(todos);
     }
   };
@@ -161,7 +167,7 @@ export const useTodoActions = ({
           id,
           createTodoSyncSnapshot(previousTodos.find((todo) => todo.id === id))
         ),
-        message: getQueuedMessage("Удаление задачи"),
+        message: getQueuedMessage(t("todoAction.label.taskDelete")),
       });
       return;
     }
@@ -173,7 +179,7 @@ export const useTodoActions = ({
       saveToLocalStorage(updatedTodos);
     } catch (error) {
       console.error("Ошибка удаления:", error);
-      showRequestError("Не удалось удалить задачу.");
+      showRequestError(t("todoAction.deleteFailed"));
       setTodos(previousTodos);
     }
   };
@@ -208,7 +214,7 @@ export const useTodoActions = ({
       persistQueuedChange({
         updatedTodos,
         nextPendingActions,
-        message: getQueuedMessage("Удаление выполненных задач"),
+        message: getQueuedMessage(t("todoAction.label.completedDelete")),
       });
       setIsDeletingCompleted(false);
       return;
@@ -235,7 +241,7 @@ export const useTodoActions = ({
         : updatedTodos;
 
     if (failedIds.length > 0) {
-      showRequestError("Не удалось удалить часть выполненных задач.");
+      showRequestError(t("todoAction.deleteCompletedPartial"));
       setTodos(finalTodos);
     }
 
@@ -264,29 +270,31 @@ export const useTodoActions = ({
         ...todo,
         order: index + 1,
       }));
+      const changedTodos = updatedTodos.filter((todo) => {
+        const previousTodo = previousTodos.find((item) => item.id === todo.id);
+        return previousTodo?.order !== todo.order;
+      });
 
       if (shouldQueueLocally) {
         persistQueuedChange({
           updatedTodos,
           nextPendingActions: queueMultipleUpdateActions(
             pendingActions,
-            updatedTodos,
+            changedTodos,
             previousTodos
           ),
-          message: getQueuedMessage("Новый порядок задач"),
+          message: getQueuedMessage(t("todoAction.label.reorder")),
         });
         return;
       }
 
       setTodos(updatedTodos);
 
-      await Promise.all(
-        updatedTodos.map((todo) => updateTodo(todo.id, todo))
-      );
+      await Promise.all(changedTodos.map((todo) => updateTodo(todo.id, todo)));
       saveToLocalStorage(updatedTodos);
     } catch (error) {
       console.error("Ошибка изменения порядка:", error);
-      showRequestError("Не удалось сохранить новый порядок задач.");
+      showRequestError(t("todoAction.reorderFailed"));
       setTodos(previousTodos);
     }
   };

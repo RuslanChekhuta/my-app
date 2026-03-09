@@ -11,7 +11,7 @@ const GlassPanel = ({
     as,
     {
       className: cn(
-        "overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/82 shadow-[0_30px_100px_rgba(17,35,46,0.1)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/68",
+        "min-w-0 overflow-hidden rounded-[1.75rem] border border-white/70 bg-white/82 shadow-[0_30px_100px_rgba(17,35,46,0.1)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/68",
         className
       ),
       ...props,

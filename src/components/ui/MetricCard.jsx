@@ -10,7 +10,7 @@ const MetricCard = ({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-slate-200/80 bg-white/85 px-4 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/80",
+        "min-w-0 rounded-2xl border border-slate-200/80 bg-white/85 px-4 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/80",
         className
       )}
     >
@@ -24,7 +24,7 @@ const MetricCard = ({
       </p>
       <p
         className={cn(
-          "mt-2 text-3xl font-bold text-slate-900 dark:text-slate-50",
+          "mt-2 break-words text-3xl font-bold text-slate-900 dark:text-slate-50",
           valueClassName
         )}
       >

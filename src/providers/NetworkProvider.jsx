@@ -1,22 +1,29 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { NetworkContext } from "../context/NetworkContext";
+import { useLocalization } from "../hooks/useLocalization";
 
-const getInitialNetworkStatus = () => {
+const getInitialNetworkStatus = (t) => {
   const isOnline = typeof navigator === "undefined" ? true : navigator.onLine;
 
   return {
     isOnline,
     showNotification: !isOnline,
-    message: isOnline
-      ? ""
-      : "Нет подключения к интернету. Показаны локальные данные.",
+    message: isOnline ? "" : t("network.offline"),
     variant: isOnline ? "info" : "error",
   };
 };
 
 const NetworkProvider = ({ children }) => {
-  const [networkStatus, setNetworkStatus] = useState(getInitialNetworkStatus);
+  const { t } = useLocalization();
+  const [networkStatus, setNetworkStatus] = useState(() =>
+    getInitialNetworkStatus(t)
+  );
   const hideTimeoutRef = useRef(null);
+  const translationRef = useRef(t);
+
+  useEffect(() => {
+    translationRef.current = t;
+  }, [t]);
 
   const clearHideTimeout = useCallback(() => {
     if (hideTimeoutRef.current) {
@@ -29,7 +36,7 @@ const NetworkProvider = ({ children }) => {
     ({
       message,
       variant = "info",
-      isOnline = networkStatus.isOnline,
+      isOnline = typeof navigator === "undefined" ? true : navigator.onLine,
       autoHide = false,
       duration = 3000,
     }) => {
@@ -52,13 +59,11 @@ const NetworkProvider = ({ children }) => {
         }, duration);
       }
     },
-    [clearHideTimeout, networkStatus.isOnline]
+    [clearHideTimeout]
   );
 
   const showOfflineMessage = useCallback(
-    (
-      message = "Нет подключения к интернету. Показаны локальные данные."
-    ) => {
+    (message = translationRef.current("network.offline")) => {
       showNotification({
         message,
         variant: "error",
@@ -69,7 +74,7 @@ const NetworkProvider = ({ children }) => {
   );
 
   const showRequestError = useCallback(
-    (message = "Не удалось выполнить запрос. Попробуйте ещё раз.") => {
+    (message = translationRef.current("network.requestError")) => {
       showNotification({
         message,
         variant: "error",
@@ -103,9 +108,33 @@ const NetworkProvider = ({ children }) => {
   );
 
   useEffect(() => {
+    setNetworkStatus((previousState) => {
+      if (!previousState.showNotification) {
+        return previousState;
+      }
+
+      if (!previousState.isOnline) {
+        return {
+          ...previousState,
+          message: t("network.offline"),
+        };
+      }
+
+      if (previousState.variant === "success") {
+        return {
+          ...previousState,
+          message: t("network.onlineRestored"),
+        };
+      }
+
+      return previousState;
+    });
+  }, [t]);
+
+  useEffect(() => {
     const handleOnline = () => {
       showNotification({
-        message: "Соединение восстановлено",
+        message: translationRef.current("network.onlineRestored"),
         variant: "success",
         isOnline: true,
         autoHide: true,

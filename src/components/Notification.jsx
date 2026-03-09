@@ -23,7 +23,7 @@ const Notification = () => {
     <StatusMessage
       tone={variant ?? "info"}
       icon={icons[variant] ?? icons.info}
-      className="motion-slide-down fixed top-4 right-4 left-4 z-50 mx-auto w-auto max-w-md shadow-[0_25px_55px_rgba(17,35,46,0.16)] sm:left-auto"
+      className="motion-slide-down fixed top-3 right-3 left-3 z-50 mx-auto w-auto max-w-none shadow-[0_25px_55px_rgba(17,35,46,0.16)] sm:top-4 sm:right-4 sm:left-auto sm:max-w-md"
     >
       {message}
     </StatusMessage>

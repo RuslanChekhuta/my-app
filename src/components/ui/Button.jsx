@@ -43,7 +43,7 @@ const Button = ({
 }) => {
   const elementProps = {
     className: cn(
-      "inline-flex items-center justify-center gap-2 border font-semibold transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 motion-press",
+      "inline-flex max-w-full select-none items-center justify-center gap-2 border font-semibold transition motion-press touch-manipulation cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[rgba(21,119,128,0.12)] disabled:cursor-not-allowed disabled:opacity-60 dark:focus-visible:ring-[rgba(84,205,208,0.12)]",
       VARIANT_CLASSES[variant] ?? VARIANT_CLASSES.secondary,
       SIZE_CLASSES[size] ?? SIZE_CLASSES.md,
       selected && (SELECTED_CLASSES[variant] ?? SELECTED_CLASSES.secondary),

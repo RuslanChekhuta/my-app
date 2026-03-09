@@ -1,31 +1,24 @@
 import StatusPill from "./ui/StatusPill";
-
-const getPendingLabel = (count) => {
-  if (count === 1) {
-    return "1 локальное изменение";
-  }
-
-  if (count > 1 && count < 5) {
-    return `${count} локальных изменения`;
-  }
-
-  return `${count} локальных изменений`;
-};
+import { useLocalization } from "../hooks/useLocalization";
 
 const PendingActionsBadge = ({ pendingActionsCount, isSyncingPending }) => {
+  const { t } = useLocalization();
   const isIdle = pendingActionsCount === 0;
+  const countLabel = t("pending.localChangesLabel", {
+    count: pendingActionsCount,
+  });
 
   return (
     <StatusPill
       tone={isIdle || isSyncingPending ? "accent" : "warm"}
       dot
-      className="motion-fade-up motion-delay-3 w-fit py-2 text-sm shadow-sm"
+      className="motion-fade-up motion-delay-3 w-full justify-center py-2 text-sm shadow-sm sm:w-fit sm:justify-start"
     >
       {isIdle
-        ? "Все изменения синхронизированы"
+        ? t("pending.badge.idle")
         : isSyncingPending
-          ? `Синхронизация: ${getPendingLabel(pendingActionsCount)}`
-          : `Ожидает синхронизации: ${getPendingLabel(pendingActionsCount)}`}
+          ? t("pending.badge.syncing", { countLabel })
+          : t("pending.badge.waiting", { countLabel })}
     </StatusPill>
   );
 };

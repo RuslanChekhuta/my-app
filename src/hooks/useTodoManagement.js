@@ -28,8 +28,10 @@ import {
 import { useTodoActions } from "./useTodoActions.js";
 import { useNetworkStatus } from "./useNetworkStatus.js";
 import { CONFLICT_STRATEGIES } from "../constants/todos";
+import { useLocalization } from "./useLocalization";
 
 export const useTodoManagement = () => {
+  const { t } = useLocalization();
   const [todos, setTodos] = useState([]);
   const [deletingId, setDeletingId] = useState(null);
   const [isDeletingCompleted, setIsDeletingCompleted] = useState(false);
@@ -74,7 +76,7 @@ export const useTodoManagement = () => {
         saveToLocalStorage(sortedServerTodos);
       } catch (error) {
         console.error("Ошибка загрузки данных:", error);
-        showRequestError("Не удалось загрузить задачи с сервера.");
+        showRequestError(t("todoManagement.loadFailed"));
       }
     };
 
@@ -83,6 +85,7 @@ export const useTodoManagement = () => {
     isOnline,
     pendingActions.length,
     showRequestError,
+    t,
   ]);
 
   useEffect(() => {
@@ -133,9 +136,7 @@ export const useTodoManagement = () => {
                 remainingActions,
                 currentAction.todoId
               );
-              showInfoMessage(
-                "Задача уже отсутствует на сервере. Принята серверная версия."
-              );
+              showInfoMessage(t("todoManagement.serverWinsMissing"));
             } else {
               const { id: previousId, ...todoPayload } = currentAction.todo;
               const recreatedTodo = await createTodo(todoPayload);
@@ -152,9 +153,7 @@ export const useTodoManagement = () => {
                 previousId,
                 resolvedTodo
               );
-              showInfoMessage(
-                "Задача была удалена на сервере. Локальная версия создана заново."
-              );
+              showInfoMessage(t("todoManagement.localRecreated"));
             }
           } else {
             const hasConflict = hasTodoConflict(
@@ -169,14 +168,10 @@ export const useTodoManagement = () => {
               syncedTodos = syncedTodos.map((todo) =>
                 todo.id === currentAction.todoId ? serverTodo : todo
               );
-              showInfoMessage(
-                "Обнаружен конфликт версии задачи. Принята серверная версия."
-              );
+              showInfoMessage(t("todoManagement.conflictServer"));
             } else {
               if (hasConflict) {
-                showInfoMessage(
-                  "Обнаружен конфликт версии задачи. Применена локальная версия."
-                );
+                showInfoMessage(t("todoManagement.conflictLocal"));
               }
 
               await updateTodo(currentAction.todoId, currentAction.todo);
@@ -191,9 +186,7 @@ export const useTodoManagement = () => {
             ) {
               nextPendingActions = remainingActions;
             } else if (hasConflict) {
-              showInfoMessage(
-                "Синхронизация конфликта завершена по стратегии локальной версии."
-              );
+              showInfoMessage(t("todoManagement.conflictSyncedLocal"));
             }
           }
         }
@@ -216,14 +209,10 @@ export const useTodoManagement = () => {
                 todo.id === currentAction.todoId ? serverTodo : todo
               );
               shouldKeepServerTodo = true;
-              showInfoMessage(
-                "Удаление отменено: при конфликте принята серверная версия."
-              );
+              showInfoMessage(t("todoManagement.deleteConflictServer"));
             } else {
               if (hasConflict) {
-                showInfoMessage(
-                  "Обнаружен конфликт перед удалением. Выбрано локальное удаление."
-                );
+                showInfoMessage(t("todoManagement.deleteConflictLocal"));
               }
 
               await deleteTodo(currentAction.todoId);
@@ -233,13 +222,9 @@ export const useTodoManagement = () => {
             }
           } else {
             if (conflictStrategy === CONFLICT_STRATEGIES.SERVER_WINS) {
-              showInfoMessage(
-                "Задача уже отсутствует на сервере. Удаление завершено серверной версией."
-              );
+              showInfoMessage(t("todoManagement.deleteMissingServer"));
             } else {
-              showInfoMessage(
-                "Задача уже отсутствует на сервере. Локальное удаление подтверждено."
-              );
+              showInfoMessage(t("todoManagement.deleteMissingLocal"));
             }
           }
           syncedTodos =
@@ -254,16 +239,14 @@ export const useTodoManagement = () => {
           setPendingActions(nextPendingActions);
 
           if (nextPendingActions.length === 0) {
-            showSuccessMessage("Локальные изменения синхронизированы.");
+            showSuccessMessage(t("todoManagement.synced"));
           }
         }
       } catch (error) {
         console.error("Ошибка синхронизации локальных изменений:", error);
 
         if (!isCancelled) {
-          showRequestError(
-            "Не удалось синхронизировать локальные изменения. Повторим позже."
-          );
+          showRequestError(t("todoManagement.syncFailed"));
         }
       } finally {
         isSyncingPendingRef.current = false;
@@ -283,6 +266,7 @@ export const useTodoManagement = () => {
     showInfoMessage,
     showRequestError,
     showSuccessMessage,
+    t,
   ]);
 
   const actions = useTodoActions({

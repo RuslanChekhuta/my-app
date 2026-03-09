@@ -7,9 +7,13 @@ export const sortedSavedTodos = (todos) => {
 };
 
 export const getNextTodoOrder = (todos) => {
-  return todos.reduce((maxOrder, todo) => {
-    return Math.max(maxOrder, todo.order ?? 0);
-  }, 0) + 1;
+  if (todos.length === 0) {
+    return 1;
+  }
+
+  return todos.reduce((minOrder, todo) => {
+    return Math.min(minOrder, todo.order ?? 1);
+  }, todos[0]?.order ?? 1) - 1;
 };
 
 const getCurrentTimestamp = () => new Date().toISOString();

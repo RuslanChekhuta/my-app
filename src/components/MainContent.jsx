@@ -7,6 +7,7 @@ import PendingActionsBadge from "./PendingActionsBadge";
 import PendingActionsPanel from "./PendingActionsPanel";
 import EyebrowChip from "./ui/EyebrowChip";
 import GlassPanel from "./ui/GlassPanel";
+import { useLocalization } from "../hooks/useLocalization";
 
 const MainContent = ({
   onAdd,
@@ -21,6 +22,7 @@ const MainContent = ({
   conflictStrategy,
   setConflictStrategy,
 }) => {
+  const { t } = useLocalization();
   const [filter, setFilter] = useState("all");
 
   const filteredTodos = todos.filter((todo) => {
@@ -37,25 +39,25 @@ const MainContent = ({
         isSyncingPending={isSyncingPending}
       />
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(19rem,23rem)] xl:items-start">
-        <section className="space-y-5">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(18rem,22rem)] xl:items-start">
+        <section className="min-w-0 space-y-5">
           <AddTodo onAdd={onAdd} />
 
           <GlassPanel className="motion-fade-up motion-delay-2 p-4 shadow-[0_30px_100px_rgba(17,35,46,0.09)] sm:p-5">
-            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <EyebrowChip tone="neutral">Рабочий поток</EyebrowChip>
-                <h2 className="display-font mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
-                  Сфокусированная рабочая лента
+            <div className="mb-5 space-y-4">
+              <div className="min-w-0 max-w-3xl">
+                <EyebrowChip tone="neutral">{t("main.eyebrow")}</EyebrowChip>
+                <h2 className="display-font mt-2 text-[1.7rem] font-semibold tracking-tight text-slate-900 dark:text-slate-50 sm:text-2xl">
+                  {t("main.title")}
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600 dark:text-slate-300">
-                  Добавляйте, сортируйте и редактируйте задачи в одном
-                  пространстве. Интерфейс подстраивается под мобильный экран и
-                  широкий экран без отдельной логики.
+                  {t("main.description")}
                 </p>
               </div>
 
-              <TodoFilter filter={filter} setFilter={setFilter} todos={todos} />
+              <div className="min-w-0">
+                <TodoFilter filter={filter} setFilter={setFilter} todos={todos} />
+              </div>
             </div>
 
             <TodoList
@@ -69,7 +71,7 @@ const MainContent = ({
           </GlassPanel>
         </section>
 
-        <aside className="space-y-4 xl:sticky xl:top-5">
+        <aside className="min-w-0 space-y-4 xl:sticky xl:top-5">
           <PendingActionsBadge
             pendingActionsCount={pendingActionsCount}
             isSyncingPending={isSyncingPending}
